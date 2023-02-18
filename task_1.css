@@ -1,0 +1,74 @@
+
+
+.outer-buttons-parent {
+    margin-left:600px;
+
+}
+
+div > div {
+    background-color: #4CAF50; 
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin:20px auto;
+    border-radius: 8px;
+  
+}
+
+.button1 {background-color: #4CAF50;} /* Green */
+.button2 {background-color: #008CBA;} /* Blue */
+.button3 {background-color: #555555; } /* Red */
+.button4 {background-color: #e7e7e7; color: black;} /* Gray */
+.button5 {background-color: #f44336;} /* Black */
+
+.uvp-list ul {
+  list-style: none;
+  max-width: 440px;
+  padding: 1rem 2rem;
+  display: block;
+  margin: 10px auto;
+}
+
+.uvp-list ul > li:before {
+    content: "";
+    height: 1.5rem;
+    width: 1.5rem;
+    display: block;
+    float: left;
+    margin-left: -1.5rem;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100%;
+  }
+
+  .uvp-list ul > li:before { 
+    background: url("https://info.openpath.com/hubfs/checkmark-round-orange.svg");
+    background-size: cover;
+    background-position: center;
+    padding: .15rem;
+    /* display: none; */
+  }
+
+
+.uvp-list ul > li {
+    clear: left;
+    padding: .5rem 0;
+   
+
+  }
+
+  .clickable{
+    cursor: pointer;
+  }
+
+  .highlight{
+    background-color: aliceblue;
+  }
+
+  li > span:hover{
+    background-color: aquamarine;
+  }

@@ -1,0 +1,101 @@
+/* This is a style for a container that holds a set of buttons */
+.outer-buttons-parent {
+  margin-left:600px;
+}
+
+/* This is a style for a div that contains another div element */
+div > div {
+  background-color: #4CAF50; 
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin:20px auto;
+  border-radius: 8px;
+}
+
+/* These are different styles for buttons with different background colors */
+.button1 {background-color: #4CAF50;} /* Green */
+.button2 {background-color: #008CBA;} /* Blue */
+.button3 {background-color: #555555; } /* Red */
+.button4 {background-color: #e7e7e7; color: black;} /* Gray */
+.button5 {background-color: #f44336;} /* Black */
+
+/* This is a style for an unordered list inside a container */
+.uvp-list ul {
+list-style: none;
+max-width: 440px;
+padding: 1rem 2rem;
+display: block;
+margin: 10px auto;
+}
+
+/* This is a style for a checkmark icon before each list item */
+.uvp-list ul > li:before {
+  content: "";
+  height: 1.5rem;
+  width: 1.5rem;
+  display: block;
+  float: left;
+  margin-left: -1.5rem;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100%;
+}
+
+/* This is a style for the checkmark icon image */
+.uvp-list ul > li:before { 
+  background: url("https://info.openpath.com/hubfs/checkmark-round-orange.svg");
+  background-size: cover;
+  background-position: center;
+  padding: .15rem;
+  /* display: none; */
+}
+
+/* This is a style for each list item */
+.uvp-list ul > li {
+  clear: left;
+  padding: .5rem 0;
+}
+
+/* This is a style for clickable elements */
+.clickable{
+  cursor: pointer;
+}
+
+/* This is a style for highlighted elements */
+.highlight{
+  background-color: aliceblue;
+}
+
+/* This is a style for a class that sets a margin to the right and left of an element */
+.mmx-3{
+  margin-right: 0.6rem !important;
+  margin-left: 0.65rem !important;
+}
+
+/* This is a style for a class that sets a margin to the right of an element */
+.mml-0{
+  margin-right: 0.6rem !important;
+  margin-left: 0rem !important;
+}
+
+/* This is a style for paragraph elements */
+p{
+  margin: 0;
+}
+
+/* This is a style for a span element inside a list item that is being hovered */
+li > span:hover{
+  background-color: aquamarine;
+}
+
+
+div > div{
+  margin: 0px;
+}
+
+

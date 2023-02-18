@@ -66,10 +66,7 @@ function slot_buttons_markup(index, row_number, buttonText = '', verticalButtons
 
     // Determines the text to display on the button based on the button text and whether a secondary button exists.
     let buttonTextDisplay = buttonText.length == 0 ? slot_buttons_markup_text(index) : buttonText;
-    if (verticalButtonsColumnsIndex !== undefined) {
-        buttonTextDisplay += '-' + verticalButtonsColumnsIndex;
-    }
-
+   
     // Returns the HTML markup for the button.
     return ` <button type='button' id='${buttonId}' class='${buttonClasses} ${buttonText.length != 0 ? verticalButtonsColumnsIndex : row_number}'>${buttonTextDisplay}</button>`;
 }

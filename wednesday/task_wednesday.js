@@ -112,7 +112,7 @@ function slot_buttons_markup_text(key) {
 
 
 
-    
+      
 // This code executes once the DOM is ready
 $(function(){
 

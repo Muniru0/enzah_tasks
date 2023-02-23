@@ -6,13 +6,13 @@ var firstRowSelectedSlots = [] // An array to store the slots selected by the us
 var secondRowSelectedSlots = [] // An array to store the slots selected by the user in the second row.
 var thirdRowSelectedSlots = [] // An array to store the slots selected by the user in the third row.
 var betRowsSelected = [] // An array to store the rows selected by the user for betting.
-let machineBet = [[4,5,6,7,8],[0,8,4,2,3],[9,0,1,2,3],[3,5,1,7,8], [2,4,0,5,7]] // A 2D array representing the machine's bet.
-let userBet = [5,4,1,6,3] // An array representing the user's bet.
+const machineBet = [[4,5,6,7,8],[0,8,4,2,3],[9,0,1,2,3],[3,5,1,7,8], [2,4,0,5,7]] // A 2D array representing the machine's bet.
+const userBet = [5,4,1,6,3] // An array representing the user's bet.
 let countDownTimer = 60 // A countdown timer for the game.
 let drawsets = [] // An array to store the sets drawn by the machine.
 let numberOfSlots = 5 // The number of slots in the game.
 let drawLotsMarkup = '' // A string to store the markup for the drawn sets.
-var  createSlotsList = true // A boolean value indicating whether to create a list of slots or not.
+
 
 var firstSlotMarkup = ''; // A string to store the markup for the first slot in each row.
 var firstSlotButtonsMarkup = ''; // A string to store the markup for the buttons associated with the first slot in each row.
@@ -23,8 +23,23 @@ var secondSlotButtonsMarkup = ''; // A string to store the markup for the button
 var thirdSlotMarkup = ''; // A string to store the markup for the third slot in each row.
 var thirdSlotButtonsMarkup = ''; // A string to store the markup for the buttons associated with the third slot in each row.
  
+
+
+
+var fourthSlotMarkup = ''; // A string to store the markup for the second slot in each row.
+var fourthSlotButtonsMarkup = ''; // A string to store the markup for the buttons associated with the second slot in each row.
+
+var fifthSlotMarkup = ''; // A string to store the markup for the third slot in each row.
+var fifthSlotButtonsMarkup = ''; // A string to store the markup for the buttons associated with the third slot in each row.
+ 
+
+
+
+
 var selectAllVerticalsButtonsMarkup = ''; // A string to store the markup for the vertical buttons associated with the first slot.
 var clearAllVerticalSlotsButtonsMarkup = ''; // A string to store the markup for the vertical buttons associated with the second slot.
+
+
 
 let tableRowMarkup = ''; // A string to store the markup for a row in the game table.
 
@@ -97,6 +112,7 @@ function slot_buttons_markup_text(key) {
 
 
 
+    
 // This code executes once the DOM is ready
 $(function(){
 
@@ -147,6 +163,8 @@ $(function(){
       firstSlotMarkup = firstSlotMarkup.concat(' ',slot_markup(index,1)) 
       secondSlotMarkup = secondSlotMarkup.concat(' ',slot_markup(index,2)) 
       thirdSlotMarkup = thirdSlotMarkup.concat(' ',slot_markup(index,3)) 
+      fourthSlotMarkup = fourthSlotMarkup.concat(' ',slot_markup(index,4)) 
+      fifthSlotMarkup = fifthSlotMarkup.concat(' ',slot_markup(index,5)) 
   
 
 
@@ -161,6 +179,8 @@ $(function(){
       firstSlotButtonsMarkup = firstSlotButtonsMarkup.concat(' ',slot_buttons_markup(index,1)) 
       secondSlotButtonsMarkup = secondSlotButtonsMarkup.concat(' ',slot_buttons_markup(index,2)) 
       thirdSlotButtonsMarkup = thirdSlotButtonsMarkup.concat(' ',slot_buttons_markup(index,3)) 
+      fourthSlotButtonsMarkup = fourthSlotButtonsMarkup.concat(' ',slot_buttons_markup(index,4)) 
+      fifthSlotButtonsMarkup = fifthSlotButtonsMarkup.concat(' ',slot_buttons_markup(index,5)) 
        }
   
       // If the index is 9, append the slot buttons markup to the end of the slots
@@ -169,7 +189,8 @@ $(function(){
        firstSlotMarkup = firstSlotMarkup.concat(' ',firstSlotButtonsMarkup);
        secondSlotMarkup = secondSlotMarkup.concat(' ',secondSlotButtonsMarkup);
        thirdSlotMarkup = thirdSlotMarkup.concat(' ', thirdSlotButtonsMarkup)
-
+       fourthSlotMarkup = fourthSlotMarkup.concat(' ',fourthSlotButtonsMarkup);
+       fifthSlotMarkup = fifthSlotMarkup.concat(' ', fourthSlotButtonsMarkup)
      
    
 
@@ -183,8 +204,10 @@ $(function(){
     $('#first-li-parent').append(firstSlotMarkup);
     $('#second-li-parent').append(secondSlotMarkup);
     $('#third-li-parent').append(thirdSlotMarkup);
-    $('#fourth-li-parent').append(selectAllVerticalsButtonsMarkup);
-    $('#fifth-li-parent').append(clearAllVerticalSlotsButtonsMarkup)
+    $('#fourth-li-parent').append(secondSlotMarkup);
+    $('#fifth-li-parent').append(thirdSlotMarkup);
+    $('#first-vertical-li-parent').append(selectAllVerticalsButtonsMarkup);
+    $('#second-vertical-li-parent').append(clearAllVerticalSlotsButtonsMarkup)
 
     
 
@@ -255,6 +278,9 @@ $('#btn-place-vertical-bet').click(function(){ placeVerticalBet(machineBet)});
     },60000);
 
 });
+
+
+
 
 
 
@@ -347,7 +373,8 @@ function button_color(key){
     return 'success';
     }
     }
-    // The function returns a corresponding Bootstrap color class for the provided key value. The key value is used to select a specific color class from the switch statement. The function takes a single parameter, which is a number representing the key value. It returns a string representing the corresponding Bootstrap color class for the provided key value.
+
+
     
     
     
@@ -919,6 +946,12 @@ function copyArray(){
  */
 async function makeApiCall() {
     try {
+
+        // Check and remove all child nodes from the table body
+        if($("#table-body").has("tr")){
+            $("#table.body").empty()
+        }
+
       // Add a busy indicator to the table while waiting for the API response.
       $('#table-body').append(apiRequestBusyIndicator()); 
   

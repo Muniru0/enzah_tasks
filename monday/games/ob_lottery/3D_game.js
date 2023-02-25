@@ -48,7 +48,7 @@ $(function () {
   // Loop through 10 slots to prepare the markup for each slot
  
 
-  $("div.ball").click(function () {
+  $(".ball-item").click(function () {
     selectASlot(this);
   });
 
@@ -241,20 +241,21 @@ function updateListOfSlots() {
  * @param {object} slotObject - The DOM element of the selected slot.
  */
 function selectASlot(slotObject) {
-  // Visually highlight the slot selection
-  const slotElement = $(slotObject).find(".4")[0];
 
-  $(slotElement).addClass("selected");
+  // Visually highlight the slot selection
+ 
+
+  $(slotObject).addClass("selected");
 
   // Get the row number and selected slot digit
-  var rowNumber = getSlotsRowNumber(slotElement);
-  var selectedSlot = getSelectedSlotDigit(slotElement);
+  var rowNumber = getSlotsRowNumber(slotObject);
+  var selectedSlot = getSelectedSlotDigit(slotObject);
 
   if (allRowsArray[rowNumber] !== undefined) {
     if (allRowsArray[rowNumber].includes(selectedSlot)) {
       console.log("deleting my code.......");
-      if ($(slotElement).hasClass("selected")) {
-        $(slotElement).removeClass("selected");
+      if ($(slotObject).hasClass("selected")) {
+        $(slotObject).removeClass("selected");
       }
 
       arrayRemove(allRowsArray[rowNumber], selectedSlot, true);
@@ -270,6 +271,8 @@ function selectASlot(slotObject) {
   console.log(allRowsArray);
 }
 
+
+
 function arrayRemove(array, element, sort = false) {
   array.splice(array.indexOf(element), 1);
   sort && array.sort();
@@ -281,7 +284,7 @@ function getSlotsRowNumber(eventObject, slots = true) {
   console.log($(eventObject));
 
   return slots
-    ? parseInt($(eventObject).attr("class").split(" ")[1])
+    ? parseInt($(eventObject).attr("id").split("-")[1])
     : $(eventObject).attr("id").split("-");
 }
 

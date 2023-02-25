@@ -1,13 +1,18 @@
-import {checkUserBetState} from './task_monday_3.js'
+// import the method to check the user bet state
+import {checkUserBetState} from './task_3_monday.js'
+
+
+
+
+
+
+
 
 // declare the buttons empty markup
 let buttonsMarkup = '';
 
 // declare the total number of buttons
 let overallBetsArray = []
-
-
-
 
 
 
@@ -85,7 +90,7 @@ function submitBet(){
  }
 
 
-
+// update the root element of the slots
 function updateListOfSlots(){
     $("#root-parent").append(buttonsMarkup)
 }
@@ -99,7 +104,7 @@ function updateListOfSlots(){
 function selectASlot(slotObject){
    
     
-    // Find the span element inside the slot and add the highlight class
+    // Visually highlight the slot selection
     const slotInnerElement =  $(slotObject).find('span');
     $(slotInnerElement).addClass('highlight');
 
@@ -108,9 +113,15 @@ function selectASlot(slotObject){
     var selectedSlot = getSelectedSlotDigit(slotObject);
 
 
+ 
+
+    // add the bet slot selected to the appropriate array
+    overallBetsArray[rowNumber] === undefined ?
+    overallBetsArray[rowNumber] = [selectedSlot] :
+    overallBetsArray[rowNumber].push(selectedSlot)
     
-    overallBetsArray[rowNumber] === undefined ? overallBetsArray[rowNumber][selectedSlot] : overallBetsArray[rowNumber].push(selectedSlot)
-    // console.log(overallBetsArray)
+    // log all the selected bets
+    console.log(overallBetsArray)
 
 }
 

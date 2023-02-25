@@ -1,49 +1,51 @@
 
 
-// This code defines and initializes various variables used in a slot machine game, such as the number of slots, the user's bet, the machine's bet, a countdown timer, and various arrays to store selected slots and drawn sets.
+const BASE_URL = 'http://localhost:8080/slot_machine/monday/games/ob_lottery/3D_game.php';
 
-var firstRowSelectedSlots = [] // An array to store the slots selected by the user in the first row.
-var secondRowSelectedSlots = [] // An array to store the slots selected by the user in the second row.
-var thirdRowSelectedSlots = [] // An array to store the slots selected by the user in the third row.
-var betRowsSelected = [] // An array to store the rows selected by the user for betting.
+// This code defines and initializes various variables used in a slot machine game, such as the number of slots, the user's bet, the machine's bet, a countdown timer, and various arrays to store selected slots and drawn sets.
+let firstRowSelectedSlots = [] // An array to store the slots selected by the user in the first row.
+let secondRowSelectedSlots = [] // An array to store the slots selected by the user in the second row.
+let thirdRowSelectedSlots = [] // An array to store the slots selected by the user in the third row.
+let betRowsSelected = [] // An array to store the rows selected by the user for betting.
 const machineBet = [[4,5,6,7,8],[0,8,4,2,3],[9,0,1,2,3],[3,5,1,7,8], [2,4,0,5,7]] // A 2D array representing the machine's bet.
 const userBet = [5,4,1,6,3] // An array representing the user's bet.
-let countDownTimer = 60 // A countdown timer for the game.
+let countDownTimer = 10 // A countdown timer for the game.
 let drawsets = [] // An array to store the sets drawn by the machine.
 let numberOfSlots = 5 // The number of slots in the game.
 let drawLotsMarkup = '' // A string to store the markup for the drawn sets.
+let isRefresh = true
 
+let firstSlotMarkup = ''; // A string to store the markup for the first slot in each row.
+let firstSlotButtonsMarkup = ''; // A string to store the markup for the buttons associated with the first slot in each row.
 
-var firstSlotMarkup = ''; // A string to store the markup for the first slot in each row.
-var firstSlotButtonsMarkup = ''; // A string to store the markup for the buttons associated with the first slot in each row.
+let secondSlotMarkup = ''; // A string to store the markup for the second slot in each row.
+let secondSlotButtonsMarkup = ''; // A string to store the markup for the buttons associated with the second slot in each row.
 
-var secondSlotMarkup = ''; // A string to store the markup for the second slot in each row.
-var secondSlotButtonsMarkup = ''; // A string to store the markup for the buttons associated with the second slot in each row.
-
-var thirdSlotMarkup = ''; // A string to store the markup for the third slot in each row.
-var thirdSlotButtonsMarkup = ''; // A string to store the markup for the buttons associated with the third slot in each row.
+let thirdSlotMarkup = ''; // A string to store the markup for the third slot in each row.
+let thirdSlotButtonsMarkup = ''; // A string to store the markup for the buttons associated with the third slot in each row.
  
 
 
 
-var fourthSlotMarkup = ''; // A string to store the markup for the second slot in each row.
-var fourthSlotButtonsMarkup = ''; // A string to store the markup for the buttons associated with the second slot in each row.
+let fourthSlotMarkup = ''; // A string to store the markup for the second slot in each row.
+let fourthSlotButtonsMarkup = ''; // A string to store the markup for the buttons associated with the second slot in each row.
 
-var fifthSlotMarkup = ''; // A string to store the markup for the third slot in each row.
-var fifthSlotButtonsMarkup = ''; // A string to store the markup for the buttons associated with the third slot in each row.
+let fifthSlotMarkup = ''; // A string to store the markup for the third slot in each row.
+let fifthSlotButtonsMarkup = ''; // A string to store the markup for the buttons associated with the third slot in each row.
  
 
 
 
 
-var selectAllVerticalsButtonsMarkup = ''; // A string to store the markup for the vertical buttons associated with the first slot.
-var clearAllVerticalSlotsButtonsMarkup = ''; // A string to store the markup for the vertical buttons associated with the second slot.
+let selectAllVerticalsButtonsMarkup = ''; // A string to store the markup for the vertical buttons associated with the first slot.
+let clearAllVerticalSlotsButtonsMarkup = ''; // A string to store the markup for the vertical buttons associated with the second slot.
 
 
 
 let tableRowMarkup = ''; // A string to store the markup for a row in the game table.
 
-
+let machineSelection = [4,1,5,2,1]
+let userSelection = [ [1,0,5,7,4], [3,5,7,8,2], [3,6,8,5,4], [7,9,4,1,2], [0,2,4,3,5] ]
 
 
 // The following function takes a slot number and row number as inputs and returns a string representing the markup for the slot in the game table.
@@ -116,16 +118,42 @@ function slot_buttons_markup_text(key) {
 // This code executes once the DOM is ready
 $(function(){
 
-    // Set up a timer countdown
+   
+    // perform API request to a php server
+
+    // ...
+
+    makePhpApiCall()
+
+    // task 2
+    machineAndUserSelection()
+
+    // // Set up a timer countdown
     setInterval(()=>{
+        
+      let locallyStoredTimer = window.localStorage.getItem('time');
+      
+      console.log(locallyStoredTimer)
+        if(locallyStoredTimer !== undefined ){
+            if(countDownTimer !== parseInt(locallyStoredTimer)){
+                countDownTimer = locallyStoredTimer
+            }
+            
+        }  
+
+
       // When the countdown reaches 1, reset the timer and draw lots
-      if(countDownTimer == 1){
+      if(countDownTimer <= 0){
         resetCountDownTimer();
         drawLots()
       }
-      // Decrement the timer and display the updated time on the page
-      countDownTimer -= 1
+    //   Decrement the timer and display the updated time on the page
+       countDownTimer -= 1
       $('#timer').text( ': ' + countDownTimer)
+     
+      // update the locally stored timer
+      window.localStorage.setItem('time',   JSON.stringify(countDownTimer) );
+      
     },1000);
     
     // If the max number of selections has been reached for the first row, log an error message and return
@@ -280,8 +308,43 @@ $('#btn-place-vertical-bet').click(function(){ placeVerticalBet(machineBet)});
 });
 
 
+function machineAndUserSelection() {
+    
+        let winCount = 0
 
+        // traverse the entire user Selection
+        userSelection.forEach((userBet,outerIndex,array)=>{
+            
+            // for efficiency check to see first items in both the
+            // user selection and the machine selection are the same
+            if((userBet[0] + userBet[userBet.length])  === (machineSelection[0] + machineSelection[machineSelection.length])){
+    
+               winCount += 1; 
 
+            }
+    
+        });
+    
+      console.log(`The user has won:${winCount} and lost:${userSelection.length - winCount}`);
+    
+     
+}
+
+const makePhpApiCall = async () => {
+    try {
+        let royalBetType = 5;
+      const response = await axios.get(`${BASE_URL}?royal=${royalBetType}`);
+  
+      const responseData = response.data;
+  
+      console.log( responseData);
+  
+      return responseData;
+    } catch (errors) {
+      console.error(errors);
+    }
+  };
+  
 
 
 /**
@@ -294,8 +357,8 @@ function selectASlot(slotObject){
     $(slotInnerElement).addClass('highlight');
 
     // Get the row number and selected slot digit
-    var rowNumber = getSlotsRowNumber(slotObject);
-    var selectedSlot = getSelectedSlotDigit(slotObject);
+    let rowNumber = getSlotsRowNumber(slotObject);
+    let selectedSlot = getSelectedSlotDigit(slotObject);
   
     // Update the array of selected slots for the appropriate row
     if(rowNumber === 1){
@@ -512,10 +575,10 @@ function selectAllSmallSlots(eventObject){
 function selectAllSlots(eventObject) {
 
     // Get the row number of the slots to be selected
-    var rowNumber = getSlotsRowNumber(eventObject);
+    let rowNumber = getSlotsRowNumber(eventObject);
 
     // Find all the slots in the row
-    var allSlots = $(document).find(`li.${rowNumber}`);
+    let allSlots = $(document).find(`li.${rowNumber}`);
    
     // Add the 'highlight' class to all the slots in the row
     for (let index = 0; index < allSlots.length; index++) {
@@ -527,7 +590,7 @@ function selectAllSlots(eventObject) {
     }
 
     // Determine which row was selected and log the selected slots for debugging purposes
-    var justToLog;
+    let justToLog;
     if(rowNumber === 1){
         justToLog =  firstRowSelectedSlots = [0,1,2,3,4,5,6,7,8,9];
     } else if(rowNumber === 2) {
@@ -549,10 +612,10 @@ function selectAllVerticalSlots(eventObject){
 
 
 
-    var slotsColumnNumber = getSlotsColumnNumber(eventObject); // Get the column number of the selected slots
+    let slotsColumnNumber = getSlotsColumnNumber(eventObject); // Get the column number of the selected slots
     console.log(slotsColumnNumber);
   
-    var allSlots = $(document).find(`span.${slotsColumnNumber}`); // Find all the slots with the same column number
+    let allSlots = $(document).find(`span.${slotsColumnNumber}`); // Find all the slots with the same column number
     let justToLog;
 
     
@@ -596,11 +659,8 @@ function selectAllVerticalSlots(eventObject){
 function clearAllSelected(eventObject){
     
     // Get the row number of the slots to be cleared.
-    var slotsRowNumber = getSlotsRowNumber(eventObject);
+    let slotsRowNumber = getSlotsRowNumber(eventObject);
     
-
-  
-   
     // If there are no slots to clear, return and log a message.
     if(getSelectedSlotsArray(slotsRowNumber).length < 1){
         console.log('Slots cleared.');
@@ -608,13 +668,13 @@ function clearAllSelected(eventObject){
     }
     
     // Find all slots that belong to the specified row and remove their highlight class.
-    var allSlots = $(document).find(`li.${slotsRowNumber}`);
+    let allSlots = $(document).find(`li.${slotsRowNumber}`);
     for (let index = 0; index < allSlots.length; index++) {
         $(allSlots[index]).find('span').removeClass('highlight');
     }
    
     // Clear the array of selected slots for the specified row and log the cleared array.
-    var justToLog;
+    let justToLog;
     if(slotsRowNumber === 1){
         justToLog =  firstRowSelectedSlots = [];
     }else if(slotsRowNumber === 2){
@@ -636,11 +696,11 @@ function clearAllSelected(eventObject){
  */
 function clearAllVerticalSlots(eventObject){
     // Get the column number for the clicked slot
-    var slotsColumnNumber = getSlotsColumnNumber(eventObject);
+    let slotsColumnNumber = getSlotsColumnNumber(eventObject);
     console.log(slotsColumnNumber)
 
     // Find all slots in the same column
-    var allSlots = $(document).find(`span.${slotsColumnNumber}`);
+    let allSlots = $(document).find(`span.${slotsColumnNumber}`);
     let justToLog;
 
     console.log(allSlots)
@@ -690,7 +750,7 @@ Places a bet using the currently selected slot rows. The function logs the selec
 function placeBet(){
 
     // Creates an array of the selected slot rows.
-    var betRowsSelected = [firstRowSelectedSlots, secondRowSelectedSlots, thirdRowSelectedSlots];
+    let betRowsSelected = [firstRowSelectedSlots, secondRowSelectedSlots, thirdRowSelectedSlots];
     
     // Logs the selected slot rows to the console.
     console.log(betRowsSelected);
@@ -731,7 +791,7 @@ Given an event object, extracts the row number of the selected slot and returns 
 function getSlotsRowNumber(eventObject){
 
     // Splits the class attribute of the event object into an array and selects the last element, which contains the row number.
-    var selectedSlotSplittedClass = $(eventObject).attr('class').split(' ');
+    let selectedSlotSplittedClass = $(eventObject).attr('class').split(' ');
     console.log(`splittedClass: ${selectedSlotSplittedClass}`)
     return parseInt(selectedSlotSplittedClass[selectedSlotSplittedClass.length - 1]);
     }
@@ -747,7 +807,7 @@ function getSlotsRowNumber(eventObject){
 function getSlotsColumnNumber(eventObject){
     
     // Get the class attribute of the selected slot
-    var selectedSlotSplittedClass = $(eventObject).attr('class').split(' ');
+    let selectedSlotSplittedClass = $(eventObject).attr('class').split(' ');
     
     // Return the last element of the splitted class, which is the column number
     return  parseInt(selectedSlotSplittedClass[selectedSlotSplittedClass.length - 1]);
@@ -763,7 +823,7 @@ function getSlotsColumnNumber(eventObject){
 function getSelectedSlotDigit(eventObject){
 
     // Get the selected slot     
-    var splittedSelection = eventObject.innerHTML.split('>')[1];
+    let splittedSelection = eventObject.innerHTML.split('>')[1];
      
     // Sanitize/process it to retrieve the actual digit
     return parseInt(splittedSelection.slice(0,splittedSelection.indexOf('<')));
@@ -848,6 +908,7 @@ function placeVerticalBet(receivedBet){
  */
 function drawLots(resetTimer = false) {
   
+    
     // Get a string of a random number and split it into an array of digits
     let drawString = (Math.random() * (10 ** numberOfSlots)).toString().split('.')[0].split('')
   
@@ -859,31 +920,64 @@ function drawLots(resetTimer = false) {
     let drawSlot;
     let drawset = [];
   
-    // Fill each slot with a digit from the drawString array and update the UI
-    for (let index = 0; index < drawString.length; index++) {
-      drawSlot = drawString[index];
-  
-      // push the slot into the drawn slots array
-      drawset.push(drawSlot);
-      
-      // update the ui
-      $(`#lot-${index}`).text(drawSlot);
+   
+
+    let locallyStoredDrawlots = window.localStorage.getItem('drawlots')
+    
+
+    if(drawset.toString() !== locallyStoredDrawlots && isRefresh){
+      drawset =  locallyStoredDrawlots.split(',')
+        
+      console.log(locallyStoredDrawlots.split(','))
+
+      for (let index = 0; index < drawset.length; index++) {
+        // update the ui
+        $(`#lot-${index}`).text(drawset[index]);
+      }
+      isRefresh = false;
+        
+    }else{
+
+         for (let index = 0; index < drawString.length; index++) {
+        drawSlot = drawString[index];
+    
+        // push the slot into the drawn slots array
+        drawset.push(drawSlot);
+        
+        // update the ui
+        $(`#lot-${index}`).text(drawSlot);
+      }
+
+
     }
-  
+    
+
     // push the set into the parent's array
     drawsets.push(drawset);
+
+
+
+    // store the values in the local storage
+    window.localStorage.setItem('drawlots', (drawset.toString()));
   
+
+
     // Reset the countdown timer if requested
     if (resetTimer) {
       resetCountDownTimer();
     }
+
+
   }
+
+
+
   
 /**
  * Resets the count down timer to 60.
  */
 function resetCountDownTimer(){
-    countDownTimer = 60;
+    countDownTimer = 10;
 }
 
 

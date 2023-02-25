@@ -12,12 +12,19 @@ let slotActionsButtonsMarkup = "";
 // declare the vertical actions buttons
 let verticalActionsButtonsAll = "";
 let verticalActionsButtonsClear = "";
+let drawLotsMarkup = ''
+let numberOfSlots = 5
 
 
 // declare the total number of buttons
 let allRowsArray = [];
+let drawsets = []
 
 const slotsCommonClass = "ball-item";
+
+
+// count down timer
+let countDownTimer = 10
 
 
 
@@ -27,13 +34,15 @@ const slotsCommonClass = "ball-item";
 $(function () {
 
 
+
+
+    handleTimer()
   console.log(playItemsName)
 
   // prepare the entire slots markup
   prepareSlots();
 
-  // call the checkUserBetState
-  buildVerticalButtons()
+
 
   // build vertical buttons
   // Loop through 10 slots to prepare the markup for each slot
@@ -51,12 +60,95 @@ $(function () {
 });
 
 
-function buildVerticalButtons(){
+
+function handleTimer(){
+
+
+    let storedTimer =  JSON.parse(window.localStorage.getItem('timer'));
+    if(storedTimer !== undefined){
+        console.log(storedTimer)
+      countDownTimer =  parseInt(storedTimer.tens.trim() + storedTimer.ones.trim());
+   
+    }
+
+    setInterval(()=>{
+       
+        // When the countdown reaches 1, reset the timer and draw lots
+        if(countDownTimer == 1){
+          resetCountDownTimer();
+          drawLots()
+        }
+      //   Decrement the timer and display the updated time on the page
+       let stringedTime = countDownTimer.toString()
+       countDownTimer -= 1
+       
+         
+         stringedTime = stringedTime.trim().split('')
+        console.log(stringedTime[0])
+      
+        const timer = {
+          ones: stringedTime[0] >= 1 ? stringedTime[0] : '0',
+          tens:stringedTime[1],
+      }
+      
+      window.localStorage.setItem('timer', JSON.stringify(timer));
+  
+        $('#timer-tens').text(stringedTime[0] >= 1 ? stringedTime[0] : 0)
+        $('#timer-ones').text(stringedTime[1])
+      
+     
+  
+      },1000);
+  
+  
 
 }
 
 
+function resetCountDownTimer(){
+    countDownTimer = 60;
+}
+
+
+/**
+ * Draws a random number and fills it in the designated slots. 
+ * @param {boolean} resetTimer - Optional parameter indicating whether to reset the countdown timer or not. Defaults to false.
+ */
+function drawLots(resetTimer = false) {
+  
+    // Get a string of a random number and split it into an array of digits
+    let drawString = (Math.random() * (10 ** numberOfSlots)).toString().split('.')[0].split('')
+  
+    // If the drawString is not long enough, generate a new one
+    if (drawString.length < numberOfSlots) {
+      drawString = (Math.random() * (10 ** numberOfSlots)).toString().split('.')[0].split('')
+    }
+  
+    let drawSlot;
+    let drawset = [];
+  
+    // Fill each slot with a digit from the drawString array and update the UI
+    for (let index = 0; index < drawString.length; index++) {
+      drawSlot = drawString[index];
+  
+      // push the slot into the drawn slots array
+      drawset.push(drawSlot);
+      
+      // update the ui
+      $(`#lot-${index}`).text(drawSlot);
+    }
+  
+    // push the set into the parent's array
+    drawsets.push(drawset);
+  
+    // Reset the countdown timer if requested
+    if (resetTimer) {
+      resetCountDownTimer();
+    }
+  }
+
 function prepareSlots() {
+
   let count = 0;
   let rowNumber;
 
@@ -73,6 +165,16 @@ function prepareSlots() {
     )
     
 
+     // If the slot is within the number of slots limit, add the draw lots markup
+     if(index < numberOfSlots){
+        drawLotsMarkup = drawLotsMarkup.concat(' ', getDrawLotsMarkup(index))
+      }
+
+      // If the slot is the last one within the number of slots limit, append the draw lots markup to the parent element
+      if(index == numberOfSlots - 1){
+        $('#draw-lots-parent').append(drawLotsMarkup)
+      }
+  
 
     if (count < 6) {
       // prepare the slots actions buttons markup
@@ -118,6 +220,14 @@ function prepareSlots() {
 
   }
 }
+
+
+function getDrawLotsMarkup(index){
+    return `<li class='h1 list-inline-item clickable lot-${index}'>
+    <span class='border text-warning rounded p-3' id='lot-${index}'>0-9</span>
+    </li>`;
+}
+
 
 
 // update the root element of the slots
@@ -417,6 +527,8 @@ function decideAction(selectedDigit,flag) {
         " ",
         slots_buttons_markup(rowNumber, count)
       );
+
+     
   
       if (count < 6) {
         // prepare the slots actions buttons markup

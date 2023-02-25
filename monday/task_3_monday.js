@@ -11,7 +11,7 @@ function checkUserBetState(){
 
 
     // traverse the entire user Selection
-    userSelection.forEach((userBet,outerIndex,arra)=>{
+    userSelection.forEach((userBet,outerIndex,array)=>{
         
         // for efficiency check to see first items in both the
         // user selection and the machine selection are the same
@@ -37,7 +37,7 @@ function checkUserBetState(){
 
     });
 
-  console.log(`User has won: ${userBetWins.length} number of bets.`)
+  console.log(`User has won: ${userBetWins.length} number of bets, @ indexes : ${userBetWins} of the user Selection`)
 }
 
 

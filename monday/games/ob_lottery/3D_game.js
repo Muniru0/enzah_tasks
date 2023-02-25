@@ -451,13 +451,7 @@ function handleRowButtons(eventObject) {
     
       let actionButtonType = actionAndRowNumber[0]
       let selectedDigit = actionAndRowNumber[1].split('').pop()
-      // Get all the slots in the row of the clicked slot.
-      let rowSlot;
-      console.log('here')
-      console.log(selectedDigit)
-
-
-      
+      let rowSlot 
     
     // Loop through all the slots in the row and select the odd-numbered slots.
     for (let rowNumber = 0; rowNumber < 5; rowNumber++) {
@@ -491,6 +485,8 @@ function handleRowButtons(eventObject) {
     }
 
 
+      // log the result to the console.log 
+      console.log(allRowsArray)
   }
 
 

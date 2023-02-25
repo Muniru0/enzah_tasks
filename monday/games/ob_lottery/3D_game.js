@@ -16,6 +16,12 @@ let drawLotsMarkup = ''
 let numberOfSlots = 5
 
 
+
+// declare and initialize the number of rows and columns
+const numberOfRows = 6
+const numberOfCols = 10
+
+
 // declare the total number of buttons
 let allRowsArray = [];
 let drawsets = []
@@ -36,11 +42,15 @@ $(function () {
 
 
 
-    handleTimer()
+   // handleTimer()
   console.log(playItemsName)
 
   // prepare the entire slots markup
   prepareSlots();
+
+  
+  // create the vertical buttons
+  prepareVerticalActionButtons()
 
 
 
@@ -106,7 +116,7 @@ function handleTimer(){
 
 
 function resetCountDownTimer(){
-    countDownTimer = 60;
+    countDownTimer = 10;
 }
 
 
@@ -151,9 +161,10 @@ function prepareSlots() {
 
   let count = 0;
   let rowNumber;
+ 
 
   // Loop through 10 slots to prepare the markup for each slot
-  for (let index = 0; index < 60; index++) {
+  for (let index = 0; index < numberOfRows*numberOfCols; index++) {
     rowNumber = Math.trunc(index / 10);
 
 
@@ -199,28 +210,36 @@ function prepareSlots() {
       count = 0;
     }
     
-    if(index >= 50){
-
-       // build the all vertical buttons
-        verticalActionsButtonsAll = verticalActionsButtonsAll.concat(' ',getVerticalSlotsActionsButtonsMarkup(index,4))
-
-        verticalActionsButtonsClear = verticalActionsButtonsClear.concat(' ',getVerticalSlotsActionsButtonsMarkup(index,5,'Clear'))
-        
-    if(index === 59){
-            
-
-            $('#root-parent').append(getListParentTag(index , verticalActionsButtonsAll))
-            $('#root-parent').append(getListParentTag(index , verticalActionsButtonsClear))
-
-        }
-    
-
-    }
+   
    
 
   }
 }
 
+ function prepareVerticalActionButtons(){
+
+  for (let index = 0; index < 10; index++) {
+   
+
+    // build the all vertical buttons
+    verticalActionsButtonsAll = verticalActionsButtonsAll.concat(' ',getVerticalSlotsActionsButtonsMarkup(index,4))
+
+    verticalActionsButtonsClear = verticalActionsButtonsClear.concat(' ',getVerticalSlotsActionsButtonsMarkup(index,5,'Clear'))
+    
+
+    
+  }
+  
+         
+
+         $('#root-parent').append(getListParentTag(9 , verticalActionsButtonsAll))
+         $('#root-parent').append(getListParentTag(9 , verticalActionsButtonsClear))
+
+     
+ 
+
+ }
+ 
 
 function getDrawLotsMarkup(index){
     return `<li class='h1 list-inline-item clickable lot-${index}'>
@@ -243,24 +262,37 @@ function updateListOfSlots() {
 function selectASlot(slotObject) {
 
   // Visually highlight the slot selection
- 
-
   $(slotObject).addClass("selected");
-
+  
   // Get the row number and selected slot digit
-  var rowNumber = getSlotsRowNumber(slotObject);
-  var selectedSlot = getSelectedSlotDigit(slotObject);
+  let rowNumberAndColumn = getSlotRowAndColumn(slotObject);
+  let selectedSlot = getSelectedSlotDigit(slotObject);
 
+    // get the row number
+    let rowNumber = rowNumberAndColumn[0]
+
+  // check if the row already exists
   if (allRowsArray[rowNumber] !== undefined) {
+    
+    // if it does and include's the selected slot
     if (allRowsArray[rowNumber].includes(selectedSlot)) {
-      console.log("deleting my code.......");
-      if ($(slotObject).hasClass("selected")) {
+      
+      // de-select the slot
+        if ($(slotObject).hasClass("selected")) {
+        
         $(slotObject).removeClass("selected");
+      
       }
+       
+        // remove the slot from the array
+         arrayRemove(allRowsArray[rowNumber], selectedSlot);
 
-      arrayRemove(allRowsArray[rowNumber], selectedSlot, true);
+         // return afterwards to prevent selecting the slot again
+         return;
     }
   }
+
+
 
   // add the bet slot selected to the appropriate array
   allRowsArray[rowNumber] === undefined
@@ -278,14 +310,11 @@ function arrayRemove(array, element, sort = false) {
   sort && array.sort();
 }
 
-function getSlotsRowNumber(eventObject, slots = true) {
+function getSlotRowAndColumn(eventObject) {
   // Splits the class attribute of the event object into an array and selects the last element, which contains the row number.
 
-  console.log($(eventObject));
+  return $(eventObject).attr("id").split("-");
 
-  return slots
-    ? parseInt($(eventObject).attr("id").split("-")[1])
-    : $(eventObject).attr("id").split("-");
 }
 
 /**
@@ -301,7 +330,7 @@ function getSelectedSlotDigit(eventObject) {
 
 function getSlotsActionsButtonsMarkup(rowNumber, count,) {
   // Determines the ID for the button based on the slot index and row number.
-  let buttonId = `${slot_buttons_markup_text(count)}-${rowNumber}`;
+  let buttonId = `${slot_buttons_markup_text(count)}-${rowNumber}-h`;
 
   // Determines the text to display on the button based on the button text and whether a secondary button exists.
   let buttonTextDisplay = slot_buttons_markup_text(count);
@@ -314,8 +343,9 @@ function getSlotsActionsButtonsMarkup(rowNumber, count,) {
 
 
 function getVerticalSlotsActionsButtonsMarkup(index, count,displayText ='All') {
-    // Determines the ID for the button based on the slot index and row number.
-    let buttonId = `${slot_buttons_markup_text(count)}-${index}`;
+   
+  // Determines the ID for the button based on the slot index and row number.
+    let buttonId = `${slot_buttons_markup_text(count)}-${index}-v`;
   
     // Determines the text to display on the button based on the button text and whether a secondary button exists.
     let style = index === 50 ? 'margin-left:0px;' : 'margin-left:13px;'
@@ -332,229 +362,203 @@ function getVerticalSlotsActionsButtonsMarkup(index, count,displayText ='All') {
  *
  * @param {Event} eventObject - The event object for the clicked slot.
  */
-function handleRowButtons(eventObject,) {
+function handleRowButtons(eventObject) {
 
+    
     // check the row number and the action performed
-    let rowNumberAndButtonType = getSlotsRowNumber(eventObject, false);
+    let rowNumberAndButtonType = getSlotRowAndColumn(eventObject);
 
     // get the action performed
     let actionButtonType = rowNumberAndButtonType[0].trim();
 
     // get the row number
     let rowNumber = rowNumberAndButtonType[1];
+
+    // get the action direction
+    let actionDirection = rowNumberAndButtonType[2];
   
-    if(rowNumber >= 50){
-        console.log('entered here')
+
+    // handle the vertical buttons click events
+    if(actionDirection === 'v'){
+        
         handleVerticalRowButtons(rowNumberAndButtonType)
 
         return;
     }
     
-    // clear the row 
-    clearAllSelected(rowNumber);
 
-    // check to see if the action is to clear in the first place
-    if ("Clear" === actionButtonType) return;
+    
+  // clear the row 
+  clearAllSelected(rowNumber);
 
-  // Get all the slots in the row of the clicked slot.
-  let rowSlots = $(document).find(`.${slotsCommonClass}.${rowNumber}`);
-  
+  // check to see if the action is to clear in the first place
+  if ("Clear" === actionButtonType) return;
+
+
+  // declare a variable as a switch for the current slot
+  let mySwitch = false
 
   // Loop through all the slots in the row and select the odd-numbered slots.
-  for (let index = 0; index < rowSlots.length; index++) {
+  for (let index = 0; index < numberOfCols; index++) {
+
+      console.log(actionButtonType)  
     
-    // get the digit of the slot
-    let selectedDigit = getSelectedSlotDigit(rowSlots[index]);
+      // select all the slots 
+      actionButtonType === "All" && (mySwitch = true)
+      
+      // select all the odd slots
+      actionButtonType === "Odd" && (mySwitch = (index % 2 === 1))
 
-    // check and decide the action to take
-    if (decideAction(selectedDigit,actionButtonType)) {
+      // select all the even slots
+      actionButtonType === "Even" && (mySwitch = (index % 2 === 0))
+
+      // select all the small slots
+      actionButtonType === "Small" && (mySwitch = (index <= 0 || index <= 4))
+
+      // select all the large slots
+      actionButtonType === "Big" && (mySwitch = index >= 5 && index <= 9)
 
 
-      // remove it from the array if it is odd
-        allRowsArray[rowNumber] === undefined
-        ? (allRowsArray[rowNumber] = [selectedDigit])
-        : allRowsArray[rowNumber].push(selectedDigit);
+     // check and decide the action to take
+      if (mySwitch) {
 
-      // de-select it in the row
-      $(rowSlots[index]).addClass(`selected`);
-    }
+          // remove it from the array if it is odd
+          allRowsArray[rowNumber] === undefined
+          ? (allRowsArray[rowNumber] = [index])
+          : allRowsArray[rowNumber].push(index);
+
+          // de-select it in the row
+          $(`#${rowNumber}-${index}`).addClass(`selected`);
+
+      }
+
+
   }
+
 
   // Log the array of first row selected slots to the console.
   console.log(allRowsArray);
+
+
 }
 
-function handleVerticalRowButtons(actionAndRowNumber){
+
+  //
+  function handleVerticalRowButtons(actionAndRowNumber){
+
+      
 
     
-
-   
-    let actionButtonType = actionAndRowNumber[0]
-    let selectedDigit = actionAndRowNumber[1].split('').pop()
-     // Get all the slots in the row of the clicked slot.
-    let rowSlot;
-    console.log('here')
-    console.log(selectedDigit)
+      let actionButtonType = actionAndRowNumber[0]
+      let selectedDigit = actionAndRowNumber[1].split('').pop()
+      // Get all the slots in the row of the clicked slot.
+      let rowSlot;
+      console.log('here')
+      console.log(selectedDigit)
 
 
+      
     
+    // Loop through all the slots in the row and select the odd-numbered slots.
+    for (let rowNumber = 0; rowNumber < 5; rowNumber++) {
+      
+    rowSlot = $(document).find(`#${rowNumber}-${selectedDigit}`)
+
+      // check and decide the action to take
+      if (actionButtonType === 'All') {
+
+          // remove it from the array if it is odd
+          allRowsArray[rowNumber] === undefined
+          ? (allRowsArray[rowNumber] = [selectedDigit])
+          : allRowsArray[rowNumber].push(selectedDigit);
+
+        // de-select it in the row
+        $(rowSlot).addClass(`selected`);
+
+
+      }else{
+
+          // remove it from the array if it is odd
+          ((allRowsArray[rowNumber] !== undefined)
+          && allRowsArray[rowNumber].includes(selectedDigit)) &&
+          arrayRemove(allRowsArray[rowNumber],selectedDigit)
+          
   
-  // Loop through all the slots in the row and select the odd-numbered slots.
-  for (let rowNumber = 0; rowNumber < 5; rowNumber++) {
+        // de-select it in the row
+        $(rowSlot).removeClass(`selected`);
+
+      }
+    }
+
+
+  }
+
+
+
+  // clear all the selected slots
+  function clearAllSelected(rowNumber) {
+
     
-   rowSlot = $(document).find(`#${rowNumber}-${selectedDigit}`)
-
-    // check and decide the action to take
-    if (actionButtonType === 'All') {
-
-         // remove it from the array if it is odd
-        allRowsArray[rowNumber] === undefined
-        ? (allRowsArray[rowNumber] = [selectedDigit])
-        : allRowsArray[rowNumber].push(selectedDigit);
-
-      // de-select it in the row
-      $(rowSlot).addClass(`selected`);
-
-
-    }else{
-
-        // remove it from the array if it is odd
-        ((allRowsArray[rowNumber] !== undefined)
-         && allRowsArray[rowNumber].includes(selectedDigit)) &&
-         arrayRemove(allRowsArray[rowNumber],selectedDigit)
+        // make sure atleast slot is selected
+        if (allRowsArray[rowNumber] === undefined) return;
         
+      
+        // If there are no slots to clear, return and log a message.
+        if (allRowsArray[rowNumber].length === 0) return;
+
+        
+        // clear all the slots of {rowNumber}
+        allRowsArray[rowNumber] = [];
+
+        // de-select all selected slots
+        for (let index = 0; index < 10; index++) {
+            
+              if($(`#${rowNumber}-${index}`).hasClass(`selected`)){
+              
+                $(`#${rowNumber}-${index}`).removeClass(`selected`);
+              }
+          
+        
+        }
+
+  
+  }
+
+
+
+  // The following function takes a slot number and row number as inputs and returns a string representing the markup for the slot in the game table.
+  function slots_buttons_markup(rowNumber, count) {
+    return `<div class="ball">
+            <div class="${slotsCommonClass} ${rowNumber}" id="${rowNumber}-${count}">${count}</div> 
+        <div class="ball-cm"></div>
+        </div>`;
+  }
+
+
+
+  // get slots parent tag
+  function getListParentTag(row_number, children) {
+    return `<li class='balls-row'><div class='row-balls ${row_number}'>${children}</div></li>`;
+  }
+
+  function slot_buttons_markup_text(key) {
+    switch (key) {
+      case 0:
+        return "Odd";
+      case 1:
+        return "Even";
+      case 2:
+        return "Big";
+      case 3:
+        return "Small";
+      case 4:
+        return "All";
+      case 5:
+        return "Clear";
+      default:
+        return "Unknown Action";
+    }
+  }
+
+
  
-       // de-select it in the row
-       $(rowSlot).removeClass(`selected`);
-
-    }
-  }
-
-
-}
-
-function clearAllSelected(rowNumber) {
-  // make sure atleast slot is selected
-  if (allRowsArray[rowNumber] === undefined) return;
-
-  // If there are no slots to clear, return and log a message.
-
-  if (allRowsArray[rowNumber].length === 0) {
-    console.log("Slots cleared for row: " + (rowNumber + 1));
-    return;
-  }
-
-  // clear all the slots of {rowNumber}
-  allRowsArray[rowNumber] = [];
-
-  // get all the selected slots
-  var allSlots = $(document).find(`.${slotsCommonClass}.${rowNumber}.selected`);
-
-  // de-select all selected slots
-  for (let index = 0; index < allSlots.length; index++) {
-    $(allSlots[index]).removeClass(`selected`);
-  }
-  console.log(allRowsArray);
-}
-
-// The following function takes a slot number and row number as inputs and returns a string representing the markup for the slot in the game table.
-function slots_buttons_markup(rowNumber, count) {
-  return `<div class="ball">
-          <div class="${slotsCommonClass} ${rowNumber}" id="${rowNumber}-${count}">${count}</div> 
-      <div class="ball-cm"></div>
-      </div>`;
-}
-
-function getListParentTag(row_number, children) {
-  return `<li class='balls-row'><div class='row-balls ${row_number}'>${children}</div></li>`;
-}
-
-function slot_buttons_markup_text(key) {
-  switch (key) {
-    case 0:
-      return "Odd";
-    case 1:
-      return "Even";
-    case 2:
-      return "Big";
-    case 3:
-      return "Small";
-    case 4:
-      return "All";
-    case 5:
-      return "Clear";
-    default:
-      return "Unknown Action";
-  }
-}
-
-
-function decideAction(selectedDigit,flag) {
-  
-
-    switch (flag.trim()) {
-      case "Odd":
-        return selectedDigit % 2 === 1;
-        
-      case "Even":
-        return selectedDigit % 2 === 0;
-       
-        case "Small":
-        return selectedDigit <= 0 || selectedDigit <= 4;
-      case "Big":
-        return selectedDigit >= 5 && selectedDigit <= 9;
-
-      case "All":
-        return true;
-     default:
-        console.log("Unknown action.");
-        break;
-    }
-
-
-  }
-
-
-  function betActions() {
-    
-    
-    let count = 0;
-    let rowNumber;
-  
-    // Loop through 10 slots to prepare the markup for each slot
-    for (let index = 0; index < 50; index++) {
-      rowNumber = Math.trunc(index / 10);
-  
-      // Prepare the slots markup for each row
-      buttonsMarkup = buttonsMarkup.concat(
-        " ",
-        slots_buttons_markup(rowNumber, count)
-      );
-
-     
-  
-      if (count < 6) {
-        // prepare the slots actions buttons markup
-        slotActionsButtonsMarkup = slotActionsButtonsMarkup.concat(
-          " ",
-          getSlotsActionsButtonsMarkup(rowNumber, count)
-        );
-      }
-  
-      // increment the count
-      count += 1;
-  
-      // for efficiency append the markup in multiples of 10
-      if (count == 10) {
-        buttonsMarkup = getListParentTag(
-          rowNumber,
-          buttonsMarkup.concat("", slotActionsButtonsMarkup)
-        );
-        updateListOfSlots();
-        buttonsMarkup = "";
-        slotActionsButtonsMarkup = "";
-        count = 0;
-      }
-    }
-  }
-  

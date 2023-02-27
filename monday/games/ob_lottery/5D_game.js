@@ -1,6 +1,10 @@
 // import the types of bets array
 import {playItemsName} from './rapid5D/data.js'
+import {getVerticalSlotsActionsButtonsMarkup,slots_buttons_markup,getSlotsActionsButtonsMarkup,arrayRemove,getDrawLotsMarkup,getListParentTag,getRandomNumber} from './3D_utils.js'
 
+import {TotalBets} from './3D_formulae.js'
+
+// import {ROYAL_5_GROUP_30} from './3D_constants.js'
 
 // declare the buttons empty markup variable
 let buttonsMarkup = "";
@@ -24,15 +28,15 @@ const numberOfCols = 10
 
 // declare the total number of buttons
 let allRowsArray = [];
-let drawsets = []
 
-const slotsCommonClass = "ball-item";
-
+let betType = 'roayl'
 
 // count down timer
-let countDownTimer = 10
+let countDownTimer = 9
 
-
+// selections for both machine and user task: 2
+let machineSelection = [4,1,5,2,1]
+let userSelection = [ [1,0,5,7,4], [3,5,7,8,2], [3,6,8,5,4], [7,9,4,1,2], [0,2,4,3,5] ]
 
 
 
@@ -40,135 +44,200 @@ let countDownTimer = 10
 $(function () {
 
 
+  myOuterFunction()
+  
+
+    // task: 2
+    machineAndUserSelection()
+
+    // start count down timer
+    handleTimer()
 
 
-   // handleTimer()
-  console.log(playItemsName)
 
   // prepare the entire slots markup
-  prepareSlots();
+  prepareSlots(1);
 
   
   // create the vertical buttons
   prepareVerticalActionButtons()
 
 
-
-  // build vertical buttons
-  // Loop through 10 slots to prepare the markup for each slot
- 
-
+  // respond to the ball-item click
   $(".ball-item").click(function () {
     selectASlot(this);
   });
 
+  // respond to the row buttons click
   $(".row-btns").click(function () {
     handleRowButtons(this);
   });
 
 
+   $('#bet-now').click(function () {
+    betNow(this);
+  });
+
+
+  // change the selected bet amount
+  $('.amount').click(function () {
+
+     $('#total-amount').text($(this)[0].innerHTML)
+     $('.active').removeClass('active')
+     $(this).addClass('active')
+
+  });
+
+  
+  // change the bet method
+  $('.play-method__item').click(function () {
+
+    if($(this).hasClass('current')) return
+    $('.current').removeClass('current')
+    $(this).addClass('current')
+
+ });
+
 });
 
 
 
-function handleTimer(){
+
+function myOuterFunction(breaker = 0){
+
+    if( breaker >= 10) return;
+
+    console.log('Outer function execution finished')
+    myOuterFunction(++breaker)
+  
+  
+}
 
 
-    let storedTimer =  JSON.parse(window.localStorage.getItem('timer'));
-    if(storedTimer !== undefined){
-        console.log(storedTimer)
-      countDownTimer =  parseInt(storedTimer.tens.trim() + storedTimer.ones.trim());
+  function checkAndGetBetInfo(row1 = [2,3,4,5,6,7,8,9],row2 = [8,7,9,2,3,4,5],selections = [1,3],run = true){
+
+
+    
+    // helper function to skip function execution
+    if (!run)  return;
+
    
-    }
+    // get the user selections
+    let row1Selections = allRowsArray[0]
+    let row2Selections = allRowsArray[1]
 
-    setInterval(()=>{
-       
-        // When the countdown reaches 1, reset the timer and draw lots
-        if(countDownTimer == 1){
-          resetCountDownTimer();
-          drawLots()
-        }
-      //   Decrement the timer and display the updated time on the page
-       let stringedTime = countDownTimer.toString()
-       countDownTimer -= 1
-       
-         
-         stringedTime = stringedTime.trim().split('')
-        console.log(stringedTime[0])
-      
-        const timer = {
-          ones: stringedTime[0] >= 1 ? stringedTime[0] : '0',
-          tens:stringedTime[1],
+    console.log('after before')
+
+    // check and make sure they are both array
+    if(!Array.isArray(row1Selections) || 
+       !Array.isArray(row2Selections) ||
+        row1Selections.length < 1 || row2Selections < 3) return;
+
+
+        console.log('after if')
+
+
+  // get the combination for the row 1   
+  const combRow1 = getCombinations(row1, selections[0])
+
+  // get the combination for the row 2
+  const combtnRow2 = getCombinations(row2,selections[1])
+
+   // check and merge the combinatn of both rows
+  const totalBetsCount = mergeAndCheck2(combRow1,combtnRow2).length
+  
+    console.log(`total bets count: ${totalBetsCount}`)
+  // update the bets count 
+  $('#total-bets-count').text(totalBetsCount)
+
+
+  console.log(combRow1)
+  console.log(combtnRow2)
+  console.log(`Total number of bets without repetitions: ${totalBetsCount}`)
+
+
+}
+
+function getCombinations(array, r){
+  const result = [];
+ 
+  // Recursive function to generate combinations
+  function generateCombos(combination, index) {
+    if (combination.length === r) {
+      result.push(combination);
+      return;
+    }
+ 
+    if (index >= array.length) {
+      return;
+    }
+ 
+    const newCombo = [...combination];
+    newCombo.push(array[index]);
+ 
+    generateCombos(newCombo, index + 1);
+    generateCombos(combination, index + 1);
+
+  }
+ 
+  generateCombos([], 0);
+  return result;
+}
+
+
+
+
+  function mergeAndCheck2(arr1, arr2) {
+  
+    let mergedArr = [];
+  for (let i = 0; i < arr1.length; i++) {
+    for (let j = 0; j < arr2.length; j++) {
+      if (arr2[j].indexOf(arr1[i][0]) !== -1 && arr1[i].every(val => arr2[j].indexOf(val) !== -1)) {
+        continue; // skip if arr1 and arr2 have same values
+      } else {
+        mergedArr.push([...arr1[i], ...arr2[j]]);
       }
-      
-      window.localStorage.setItem('timer', JSON.stringify(timer));
-  
-        $('#timer-tens').text(stringedTime[0] >= 1 ? stringedTime[0] : 0)
-        $('#timer-ones').text(stringedTime[1])
-      
-     
-  
-      },1000);
-  
-  
-
-}
-
-
-function resetCountDownTimer(){
-    countDownTimer = 10;
-}
-
-
-/**
- * Draws a random number and fills it in the designated slots. 
- * @param {boolean} resetTimer - Optional parameter indicating whether to reset the countdown timer or not. Defaults to false.
- */
-function drawLots(resetTimer = false) {
-  
-    // Get a string of a random number and split it into an array of digits
-    let drawString = (Math.random() * (10 ** numberOfSlots)).toString().split('.')[0].split('')
-  
-    // If the drawString is not long enough, generate a new one
-    if (drawString.length < numberOfSlots) {
-      drawString = (Math.random() * (10 ** numberOfSlots)).toString().split('.')[0].split('')
-    }
-  
-    let drawSlot;
-    let drawset = [];
-  
-    // Fill each slot with a digit from the drawString array and update the UI
-    for (let index = 0; index < drawString.length; index++) {
-      drawSlot = drawString[index];
-  
-      // push the slot into the drawn slots array
-      drawset.push(drawSlot);
-      
-      // update the ui
-      $(`#lot-${index}`).text(drawSlot);
-    }
-  
-    // push the set into the parent's array
-    drawsets.push(drawset);
-  
-    // Reset the countdown timer if requested
-    if (resetTimer) {
-      resetCountDownTimer();
     }
   }
+  return mergedArr;
+  }
 
-function prepareSlots() {
+function machineAndUserSelection(run = false) {
+    
+  if (!run) return ;
+  let winCount = 0
+
+  // traverse the entire user Selection
+  userSelection.forEach((userBet,outerIndex,array)=>{
+      
+      // for efficiency check to see first items in both the
+      // user selection and the machine selection are the same
+      if((userBet[0] + userBet[userBet.length])  === (machineSelection[0] + machineSelection[machineSelection.length])){
+
+         winCount += 1; 
+
+      }
+
+  });
+
+console.log(`The user has won:${winCount} and lost:${userSelection.length - winCount}`);
+
+
+}
+
+
+function prepareSlots(numRows = numberOfRows,numCols = numberOfCols) {
 
   let count = 0;
   let rowNumber;
  
 
   // Loop through 10 slots to prepare the markup for each slot
-  for (let index = 0; index < numberOfRows*numberOfCols; index++) {
+  for (let index = 0; index < numRows*numCols; index++) {
+   
+   
     rowNumber = Math.trunc(index / 10);
-
-
-    
+ 
     // Prepare the slots markup for each row
     buttonsMarkup = buttonsMarkup.concat(
       " ",
@@ -181,10 +250,6 @@ function prepareSlots() {
         drawLotsMarkup = drawLotsMarkup.concat(' ', getDrawLotsMarkup(index))
       }
 
-      // If the slot is the last one within the number of slots limit, append the draw lots markup to the parent element
-      if(index == numberOfSlots - 1){
-        $('#draw-lots-parent').append(drawLotsMarkup)
-      }
   
 
     if (count < 6) {
@@ -200,7 +265,7 @@ function prepareSlots() {
 
     // for efficiency append the markup in multiples of 10
     if (count == 10 && index < 50) {
-      buttonsMarkup = getListParentTag(
+        buttonsMarkup = getListParentTag(
         rowNumber,
         buttonsMarkup.concat("", slotActionsButtonsMarkup)
       );
@@ -216,12 +281,12 @@ function prepareSlots() {
   }
 }
 
- function prepareVerticalActionButtons(){
+ function prepareVerticalActionButtons(run){
+
+    if (!run) return;
 
   for (let index = 0; index < 10; index++) {
-   
-
-    // build the all vertical buttons
+     // build the all vertical buttons
     verticalActionsButtonsAll = verticalActionsButtonsAll.concat(' ',getVerticalSlotsActionsButtonsMarkup(index,4))
 
     verticalActionsButtonsClear = verticalActionsButtonsClear.concat(' ',getVerticalSlotsActionsButtonsMarkup(index,5,'Clear'))
@@ -229,9 +294,7 @@ function prepareSlots() {
 
     
   }
-  
-         
-
+          // add the vertical actions buttons
          $('#root-parent').append(getListParentTag(9 , verticalActionsButtonsAll))
          $('#root-parent').append(getListParentTag(9 , verticalActionsButtonsClear))
 
@@ -241,22 +304,16 @@ function prepareSlots() {
  }
  
 
-function getDrawLotsMarkup(index){
-    return `<li class='h1 list-inline-item clickable lot-${index}'>
-    <span class='border text-warning rounded p-3' id='lot-${index}'>0-9</span>
-    </li>`;
-}
-
-
-
 // update the root element of the slots
 function updateListOfSlots() {
   
   $("#root-parent").append(buttonsMarkup);
 }
 
+
+
 /**
- * Select a slot by adding highlight class to its span element and storing its digit in the appropriate row array.
+ * handle a slot lick
  * @param {object} slotObject - The DOM element of the selected slot.
  */
 function selectASlot(slotObject) {
@@ -295,9 +352,18 @@ function selectASlot(slotObject) {
 
 
   // add the bet slot selected to the appropriate array
-  allRowsArray[rowNumber] === undefined
+     allRowsArray[rowNumber] === undefined
     ? (allRowsArray[rowNumber] = [selectedSlot])
     : allRowsArray[rowNumber].push(selectedSlot);
+
+
+
+
+    // all group 120
+     handleAllGroup120(allRowsArray[rowNumber]);
+
+    // All group 60
+    checkAndGetBetInfo(allRowsArray[0],allRowsArray[1],[1,3],false)
 
   // log all the selected bets
   console.log(allRowsArray);
@@ -305,14 +371,35 @@ function selectASlot(slotObject) {
 
 
 
-function arrayRemove(array, element, sort = false) {
-  array.splice(array.indexOf(element), 1);
-  sort && array.sort();
+// function to handle all group 120 selections
+function handleAllGroup120(userSelectionrw1,sampleSpace = 5){
+  
+
+    
+  // get the combination for the row 1 
+
+  // get the combination for the row 2
+  const combtnRow2 = getCombinations(userSelectionrw1,sampleSpace)
+
+   // check and merge the combinatn of both rows
+  const totalBetsCount = combtnRow2.length
+  
+    console.log(`total bets count: ${totalBetsCount}`)
+  // update the bets count 
+  $('#total-bets-count').text(totalBetsCount)
+
+
+
+  console.log(combtnRow2)
+  console.log(`Total number of bets without repetitions: ${totalBetsCount}`)
+
+
 }
 
+// get the slot row and column positions
 function getSlotRowAndColumn(eventObject) {
-  // Splits the class attribute of the event object into an array and selects the last element, which contains the row number.
-
+ 
+  // get the ID of the slot(i.e split it to obtain the column and row number)
   return $(eventObject).attr("id").split("-");
 
 }
@@ -325,35 +412,6 @@ function getSlotRowAndColumn(eventObject) {
 function getSelectedSlotDigit(eventObject) {
   return parseInt(eventObject.innerHTML);
 }
-
-
-
-function getSlotsActionsButtonsMarkup(rowNumber, count,) {
-  // Determines the ID for the button based on the slot index and row number.
-  let buttonId = `${slot_buttons_markup_text(count)}-${rowNumber}-h`;
-
-  // Determines the text to display on the button based on the button text and whether a secondary button exists.
-  let buttonTextDisplay = slot_buttons_markup_text(count);
-
-  return `<div class="row-btns ${rowNumber}" id='${buttonId}'> <span class="all">${buttonTextDisplay}</span></div>`;
-
-}
-
-
-
-
-function getVerticalSlotsActionsButtonsMarkup(index, count,displayText ='All') {
-   
-  // Determines the ID for the button based on the slot index and row number.
-    let buttonId = `${slot_buttons_markup_text(count)}-${index}-v`;
-  
-    // Determines the text to display on the button based on the button text and whether a secondary button exists.
-    let style = index === 50 ? 'margin-left:0px;' : 'margin-left:13px;'
-  
-    return `<div style=${style} class="row-btns ${index}" id='${buttonId}'> <span class="all">${displayText}</span></div>`;
-  
-  }
-  
 
 
 /**
@@ -522,39 +580,105 @@ function handleRowButtons(eventObject) {
 
 
 
-  // The following function takes a slot number and row number as inputs and returns a string representing the markup for the slot in the game table.
-  function slots_buttons_markup(rowNumber, count) {
-    return `<div class="ball">
-            <div class="${slotsCommonClass} ${rowNumber}" id="${rowNumber}-${count}">${count}</div> 
-        <div class="ball-cm"></div>
-        </div>`;
-  }
 
 
 
-  // get slots parent tag
-  function getListParentTag(row_number, children) {
-    return `<li class='balls-row'><div class='row-balls ${row_number}'>${children}</div></li>`;
-  }
 
-  function slot_buttons_markup_text(key) {
-    switch (key) {
-      case 0:
-        return "Odd";
-      case 1:
-        return "Even";
-      case 2:
-        return "Big";
-      case 3:
-        return "Small";
-      case 4:
-        return "All";
-      case 5:
-        return "Clear";
-      default:
-        return "Unknown Action";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    function handleTimer(run = false){
+         
+
+      if(!run) return ;
+      
+    
+    const locallyStoredTime =   window.localStorage.getItem('timer-ones')
+    const locallyStoredDrawlots = window.localStorage.getItem('drawlots');
+
+   
+         
+    if(locallyStoredTime !== undefined){
+      if(locallyStoredTime !== countDownTimer){
+        
+        console.log('here')
+        countDownTimer = locallyStoredTime
+        $('#draw-lot').text(locallyStoredDrawlots)
+
+        
+       }
     }
-  }
 
 
- 
+    setInterval(()=>{
+   
+      // update the timer
+      countDownTimer =  countDownTimer <= 0 ? 9 : countDownTimer - 1
+      let drawlot 
+
+      // when the count down timer reaches 0 re-generate another
+      // random number show it on the web and locally persist it.
+      if(countDownTimer == 0){
+      
+        drawlot = getRandomNumber(5).toString()
+      
+        $('#draw-lot').text(drawlot)
+      
+        window.localStorage.setItem('drawlots',drawlot)
+      
+      }
+
+     // update time on the screen and localStorage
+      $('#timer-ones').text(countDownTimer)
+     window.localStorage.setItem('timer-ones', countDownTimer)
+     
+     
+      
+      
+
+    },1000);
+    }

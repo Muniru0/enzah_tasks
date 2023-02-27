@@ -1,8 +1,23 @@
-// find the index of two numbers from an array 0 - 9 such that when you add their values it should be equal to a given number : 8
 
 
-
-           {
+const Game5DDataModel =
+ [
+    {
+    "gameName": "5D",
+	"playGroups": [{
+		"playGroupName": "Rapid5D",
+		"playMethods": [{
+			"playMethodName": "All-5",
+			"playMethods": [{
+					"name": "All-5 Straight(Joint)",
+					"numberOfRows": 5,
+					"basePrize": 162,
+					"betPlan": [],
+					"repeations": [],
+					"sectionTitle": "Straight",
+					"howToPlay": "How to play: Select 1 No. from 1st, 2nd, 3rd, 4th, 5th form 1bet. Selected and winning No. same & in order, as win.Win Sample：Bet plan: 1, 2, 3, 4, 5; Winning No.: 1, 2, 3, 4, 5, as win"
+				},
+                {
                     "name":"All-5 Straight(Manual)",
                     "numberOfRows":0,
                     "basePrize":162,
@@ -80,4 +95,14 @@
         "repeations":[],
         "sectionTitle":"Group",
         "howToPlay":"How to play: Select 1 Three of a Kind & 1 One Pair form 1bet. Three of a Kind occur 3x, One Pair occur 2x in winning No., as win.Win Sample：Bet plan: Three of a Kind: 8; One Pair: 2; Winning No.: 2, 2, 8, 8, 8, as win."
-    },
+    }
+
+
+
+			]
+		}]
+	}],
+    
+}]
+
+export {Game5DDataModel}

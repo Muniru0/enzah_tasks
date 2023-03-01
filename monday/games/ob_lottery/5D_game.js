@@ -1,10 +1,29 @@
 // import the types of bets array
-import {playItemsName} from './rapid5D/data.js'
-import {getVerticalSlotsActionsButtonsMarkup,slots_buttons_markup,getSlotsActionsButtonsMarkup,arrayRemove,getDrawLotsMarkup,getListParentTag,getRandomNumber} from './3D_utils.js'
+import {getVerticalSlotsActionsButtonsMarkup,slots_buttons_markup,getSlotsActionsButtonsMarkup,arrayRemove,getDrawLotsMarkup,getListParentTag,getRandomNumber,getPlayMethodTypesMarkup,playMethodsGroupName,getLotteryListMarkup} from './3D_utils.js'
 
-import {TotalBets} from './3D_formulae.js'
+import {Game5DDataModel } from "./models/data_model.js";
+import { LotteryObj, PlayMethod} from "./models/classes_models.js"
+import {INSTANT_GAME,PK10, _5D, MARK6, G11x6,FAST3, G3D, NORTH_VIETLOTT,Happy8, CENTRAL_VIETLOTT, SOUTH_VIETLOTT,G2COLOR,G4D,THAILOT, PLAY_METHODS_GROUP_CONSTANT_NAME,PLAY_GROUP_CONSTANT_NAME,PLAY_METHODS_JSON_KEY} from "./3D_constants.js";
 
-// import {ROYAL_5_GROUP_30} from './3D_constants.js'
+
+
+
+// declare Lotteries array 
+let lotteries = [INSTANT_GAME,PK10, _5D, MARK6, G11x6,FAST3, G3D, NORTH_VIETLOTT,Happy8, CENTRAL_VIETLOTT, SOUTH_VIETLOTT,G2COLOR,G4D,THAILOT, ];
+
+let lotteriesListItems = [
+  ['Instant game', 'Instant 5D','Instant Fast','Instant 11x3'],
+  ['Instant PK10', 'Rapid Racer','Lucky Airship','Lucky10 Ball'],
+  ['Instant 5D', 'Hanoi 1min','Rapid 5D','QQ 5D','Lucky 5mins','Lucky5 Ball','Hanoi 5mins'],
+  ['Rapid Mark', 'Mark6 5mins','Hong Kong mark6','Macao Mark6'],
+  ['Instant 11x5', 'Rapid 11x5','Lucky 11x5'],
+  ['Instant Fast3', 'Rapid Fast3','Lucky Fast3'],
+  ['Rapid 3D', 'Lucky 3D','China 3D','P3/P5'],
+  ['Lucky20 Ball', 'Rapid Happy','China Happy'],
+  ['Rapid 2colour Ball', 'Lucky 2colour','China 2colour ball'],
+  ['Magnum 4D', 'TOTO 4D','Damacai H3D','Singapore 4D','Lucky 4d'],
+  ['Hanoi', 'Quang Ninh','Bac Ninh','Haiphong','Nam Dinh','Thai Binh','Rapid Vn North','Lucky Vn North'],
+];
 
 // declare the buttons empty markup variable
 let buttonsMarkup = "";
@@ -18,6 +37,8 @@ let verticalActionsButtonsAll = "";
 let verticalActionsButtonsClear = "";
 let drawLotsMarkup = ''
 let numberOfSlots = 5
+let _5d 
+let playGroup 
 
 
 
@@ -27,7 +48,12 @@ const numberOfCols = 10
 
 
 // declare the total number of buttons
-let allRowsArray = [];
+let allUserSelections = [];
+
+
+// declare variable for the selected play method
+let selectedPlayMethodObj 
+
 
 let betType = 'roayl'
 
@@ -40,11 +66,21 @@ let userSelection = [ [1,0,5,7,4], [3,5,7,8,2], [3,6,8,5,4], [7,9,4,1,2], [0,2,4
 
 
 
+
+let playMethodsObjs = []
+
+
+
+
 // This code executes once the DOM is ready
 $(function () {
 
 
-  myOuterFunction()
+
+
+
+
+  sandboxFunction()
   
 
     // task: 2
@@ -56,27 +92,79 @@ $(function () {
 
 
   // prepare the entire slots markup
-  prepareSlots(1);
+ // prepareSlots(1);
 
   
   // create the vertical buttons
   prepareVerticalActionButtons()
 
 
-  // respond to the ball-item click
-  $(".ball-item").click(function () {
+  // 
+  
+  // handle slots selections
+  $('body').on('click', '.series', function () {
+
+
+      // console.log(  $(this).find('.list-ticketName'))
+      // return;
+    if($(this).hasClass('is-active')){
+      $(this).removeClass('is-active')
+      $(this).find('.list-ticketName').addClass('hidden')
+      return;
+    }
+
+
+    $('.is-active').removeClass('active')
+    $(this).addClass('is-active')
+    $(this).find('.list-ticketName').removeClass('hidden')
+    
+  });
+
+
+  // handle play group change
+  $('body').on('click', '.play-group-name', function () {
+    
+    // provide a visual change
+    $('.current').removeClass('current')
+    $(this).parent().addClass('current')
+
+    // get the position of the play group
+    const _playGroupPosition = $(this).attr('id').split('-').pop()
+    console.log(_playGroupPosition)
+
+   
+    
+    
+     handlePlayGroupChange(_5d.playGroups[0].playMethods[_playGroupPosition] )
+
+
+
+  });
+
+
+  // handle slots selections
+  $('body').on('click', '.ball-item', function () {
     selectASlot(this);
   });
 
-  // respond to the row buttons click
-  $(".row-btns").click(function () {
+  // handle row buttons
+  $('body').on('click', '.row-btns', function () {
     handleRowButtons(this);
+    
   });
+
+
+
+
+
+
 
 
    $('#bet-now').click(function () {
     betNow(this);
   });
+
+    
 
 
   // change the selected bet amount
@@ -89,12 +177,21 @@ $(function () {
   });
 
   
+
   // change the bet method
   $('.play-method__item').click(function () {
 
     if($(this).hasClass('current')) return
+
+    // update the ui
     $('.current').removeClass('current')
     $(this).addClass('current')
+
+    // update the current play method
+    selectedPlayMethodObj = playMethodsObjs[parseInt($(this).attr('id'))]
+    
+    // prepare the bets space
+     prepareBetSpace(selectedPlayMethodObj)
 
  });
 
@@ -102,16 +199,234 @@ $(function () {
 
 
 
-
-function myOuterFunction(breaker = 0){
-
-    if( breaker >= 10) return;
-
-    console.log('Outer function execution finished')
-    myOuterFunction(++breaker)
   
+  // respond to the ball-item click
+  
+
+function sandboxFunction(breaker = 0){
+
+
+
+  
+lotteries.forEach((lotteryHeader,index,arr) => {
+
+    
+   // list out the classic lotteries 
+   $("#classic-lotto").append(getLotteryListMarkup(lotteryHeader,lotteriesListItems [index]))
+   
+
+});
+
+
+ 
+
+  let gamesObj = {};
+  const game5d_data_model = Game5DDataModel
+
+  const gamesJsonDataModel =  JSON.parse(JSON.stringify(game5d_data_model));
+
+    gamesJsonDataModel.forEach((game,gameIndex,gameArr)=>{
+           
+           if(game['lotteryName'] == _5D){
+               gamesObj[game['lotteryName']] = new LotteryObj(game)
+              
+           }
+       });
+           
+
+
+
+
+    _5d = gamesObj[_5D].LotteryJsonObj
+   const playGroups = _5d.playGroups
+
+
+  
+  
+   if(Array.isArray(playGroups)){
+    
+
+    // check if the play groups are available(e.g Rapid 5D,hanoi, etc)
+    if(playGroups[0] === undefined) return
+    
+
+    // since this is just an init, get the first play group (i.e Rapid 5D)
+     playGroup = playGroups[0]
+
+    // get all the play methods names under the play group (e.g. All 5, All 4 ,All 3)
+    playGroup.playMethodsNames.forEach((item,index,arr)=>{
+      $("#play-group-ul").append(playMethodsGroupName(item,index,`${_5d.lotteryName}-${playGroup.playGroupName}-${index}`))
+    });
+    
+    
+
+    
+    // get the straight types of play methods
+    const straightPlayMethod = playGroup.playMethods[0].Straight
+
+    // get the group types of play methods
+    const GroupPlayMethod = playGroup.playMethods[0].Group
+  
+    // get the other types of play methods
+    const otherPlayMethod = playGroup.playMethods[0].other
+   
+          
+    // turn the json data of the play methods into play methods
+    // objects : Straight
+        if(straightPlayMethod !== undefined){
+          straightPlayMethod.forEach((item,index,arr)=>{
+          
+            // set the defalut play Method obj
+            index === 0 && (selectedPlayMethodObj = item)
+          playMethodsObjs.push(new PlayMethod(item))
+
+        })
+
+      }
+
+
+      // :Group
+      if(GroupPlayMethod !== undefined){
+
+        GroupPlayMethod.forEach((item,index,arr)=>{
+
+          playMethodsObjs.push(new PlayMethod(item))
+
+        })
+      }
+
+
+      // : Other
+      if(otherPlayMethod !== undefined){
+
+        otherPlayMethod.forEach((item,index,arr)=>{
+
+          playMethodsObjs.push(new PlayMethod(item))
+
+        })
+      }
+
+   $("#play-types-parent").append(getPlayMethodTypesMarkup(straightPlayMethod,GroupPlayMethod))
+
+          
+
+   
+      
+
+    
+   }
+
+
+   console.log(playMethodsObjs)
+
+   // after traversing the data model, prepare the bet space.
+   prepareBetSpace()
+
+
+
+   
+  
+
+
   
 }
+
+
+
+ function handlePlayGroupChange(_playGroup = playGroup){
+  
+
+
+   
+    // get the straight types of play methods
+    const straightPlayMethod = _playGroup.playMethods[0].Straight
+
+    // get the group types of play methods
+    const GroupPlayMethod = _playGroup.playMethods[0].Group
+  
+    // get the other types of play methods
+    const otherPlayMethod = _playGroup.playMethods[0].other
+   
+
+
+    playMethodsObjs = []
+          
+    // turn the json data of the play methods into play methods
+    // objects : Straight
+        if(straightPlayMethod !== undefined){
+          straightPlayMethod.forEach((item,index,arr)=>{
+          
+            // set the defalut play Method obj
+            index === 0 && (selectedPlayMethodObj = item)
+          playMethodsObjs.push(new PlayMethod(item))
+
+        })
+
+      }
+
+
+      // :Group
+      if(GroupPlayMethod !== undefined){
+
+        GroupPlayMethod.forEach((item,index,arr)=>{
+
+          playMethodsObjs.push(new PlayMethod(item))
+
+        })
+      }
+
+
+      // : Other
+      if(otherPlayMethod !== undefined){
+
+        otherPlayMethod.forEach((item,index,arr)=>{
+
+          playMethodsObjs.push(new PlayMethod(item))
+
+        })
+      }
+
+   $("#play-types-parent").empty()
+   $("#play-types-parent").append(getPlayMethodTypesMarkup(straightPlayMethod,GroupPlayMethod))
+
+          
+
+   
+      
+
+    
+   }
+
+
+   // after traversing the data model, prepare the bet space.
+   prepareBetSpace()
+  
+
+
+
+  // prepare the bet space
+ function prepareBetSpace(playMethodObj = playMethodsObjs[0]){
+
+
+   // clear all the selections 
+    allUserSelections.length !== 0 && (allUserSelections = [])
+
+
+
+    console.log(playMethodObj.numberOfRows)
+    //prepare the slots
+    prepareSlots(playMethodObj.numberOfRows)
+
+
+    // update the how to play 
+    $('#how-to-play').text(playMethodObj.howToPlay)
+
+
+    //handle user selections combinations 
+    //handleBetCombination()
+    
+
+ }
 
 
   function checkAndGetBetInfo(row1 = [2,3,4,5,6,7,8,9],row2 = [8,7,9,2,3,4,5],selections = [1,3],run = true){
@@ -123,10 +438,10 @@ function myOuterFunction(breaker = 0){
 
    
     // get the user selections
-    let row1Selections = allRowsArray[0]
-    let row2Selections = allRowsArray[1]
+    let row1Selections = allUserSelections[0]
+    let row2Selections = allUserSelections[1]
 
-    console.log('after before')
+   
 
     // check and make sure they are both array
     if(!Array.isArray(row1Selections) || 
@@ -134,7 +449,7 @@ function myOuterFunction(breaker = 0){
         row1Selections.length < 1 || row2Selections < 3) return;
 
 
-        console.log('after if')
+       
 
 
   // get the combination for the row 1   
@@ -220,7 +535,7 @@ function machineAndUserSelection(run = false) {
 
   });
 
-console.log(`The user has won:${winCount} and lost:${userSelection.length - winCount}`);
+
 
 
 }
@@ -231,10 +546,15 @@ function prepareSlots(numRows = numberOfRows,numCols = numberOfCols) {
   let count = 0;
   let rowNumber;
  
+    // check the 
+  // empty the slots wrapper.
+   $('#slots-wrapper').empty();
+
+
 
   // Loop through 10 slots to prepare the markup for each slot
   for (let index = 0; index < numRows*numCols; index++) {
-   
+  
    
     rowNumber = Math.trunc(index / 10);
  
@@ -264,7 +584,7 @@ function prepareSlots(numRows = numberOfRows,numCols = numberOfCols) {
     count += 1;
 
     // for efficiency append the markup in multiples of 10
-    if (count == 10 && index < 50) {
+    if (count == 10) {
         buttonsMarkup = getListParentTag(
         rowNumber,
         buttonsMarkup.concat("", slotActionsButtonsMarkup)
@@ -279,6 +599,7 @@ function prepareSlots(numRows = numberOfRows,numCols = numberOfCols) {
    
 
   }
+
 }
 
  function prepareVerticalActionButtons(run){
@@ -307,7 +628,7 @@ function prepareSlots(numRows = numberOfRows,numCols = numberOfCols) {
 // update the root element of the slots
 function updateListOfSlots() {
   
-  $("#root-parent").append(buttonsMarkup);
+  $("#slots-wrapper").append(buttonsMarkup);
 }
 
 
@@ -329,10 +650,10 @@ function selectASlot(slotObject) {
     let rowNumber = rowNumberAndColumn[0]
 
   // check if the row already exists
-  if (allRowsArray[rowNumber] !== undefined) {
+  if (allUserSelections[rowNumber] !== undefined) {
     
     // if it does and include's the selected slot
-    if (allRowsArray[rowNumber].includes(selectedSlot)) {
+    if (allUserSelections[rowNumber].includes(selectedSlot)) {
       
       // de-select the slot
         if ($(slotObject).hasClass("selected")) {
@@ -342,44 +663,60 @@ function selectASlot(slotObject) {
       }
        
         // remove the slot from the array
-         arrayRemove(allRowsArray[rowNumber], selectedSlot);
+         arrayRemove(allUserSelections[rowNumber], selectedSlot);
 
          // return afterwards to prevent selecting the slot again
          return;
     }
   }
 
-
+  console.log('how')
 
   // add the bet slot selected to the appropriate array
-     allRowsArray[rowNumber] === undefined
-    ? (allRowsArray[rowNumber] = [selectedSlot])
-    : allRowsArray[rowNumber].push(selectedSlot);
+     allUserSelections[rowNumber] === undefined
+    ? (allUserSelections[rowNumber] = [selectedSlot])
+    : allUserSelections[rowNumber].push(selectedSlot);
 
 
 
 
-    // all group 120
-     handleAllGroup120(allRowsArray[rowNumber]);
+    // handle combinations
+     handleBetCombination();
 
     // All group 60
-    checkAndGetBetInfo(allRowsArray[0],allRowsArray[1],[1,3],false)
+  //  checkAndGetBetInfo(allUserSelections[0],allUserSelections[1],[1,3],false)
 
   // log all the selected bets
-  console.log(allRowsArray);
+  console.log(allUserSelections);
+
+
 }
 
 
 
 // function to handle all group 120 selections
-function handleAllGroup120(userSelectionrw1,sampleSpace = 5){
+function handleBetCombination(playMethodObj = playMethodsObjs[0]){
+  
+    
+    if(allUserSelections.length !== playMethodObj.betPlan.length){
+
+      console.log('sorry user selections still not enough');
+
+      return;
+    }
+
+
+  let combinations = []
   
 
+    allUserSelections.forEach((userSelection,index,arr)=>{
+      combinations.push(getCombinations(userSelection,playMethodObj.betPlan[index]))
+    });
+  
     
-  // get the combination for the row 1 
+    console.log(combinations)
 
-  // get the combination for the row 2
-  const combtnRow2 = getCombinations(userSelectionrw1,sampleSpace)
+  return
 
    // check and merge the combinatn of both rows
   const totalBetsCount = combtnRow2.length
@@ -444,7 +781,7 @@ function handleRowButtons(eventObject) {
         return;
     }
     
-
+   
     
   // clear the row 
   clearAllSelected(rowNumber);
@@ -459,7 +796,7 @@ function handleRowButtons(eventObject) {
   // Loop through all the slots in the row and select the odd-numbered slots.
   for (let index = 0; index < numberOfCols; index++) {
 
-      console.log(actionButtonType)  
+      
     
       // select all the slots 
       actionButtonType === "All" && (mySwitch = true)
@@ -479,23 +816,28 @@ function handleRowButtons(eventObject) {
 
      // check and decide the action to take
       if (mySwitch) {
+       
 
           // remove it from the array if it is odd
-          allRowsArray[rowNumber] === undefined
-          ? (allRowsArray[rowNumber] = [index])
-          : allRowsArray[rowNumber].push(index);
+          allUserSelections[rowNumber] === undefined
+          ? (allUserSelections[rowNumber] = [index])
+          : allUserSelections[rowNumber].push(index);
+         
 
           // de-select it in the row
           $(`#${rowNumber}-${index}`).addClass(`selected`);
 
       }
 
-
+     
   }
 
 
-  // Log the array of first row selected slots to the console.
-  console.log(allRowsArray);
+  // perform the combination of the row buttons selection
+  handleBetCombination(selectedPlayMethodObj);
+
+
+ 
 
 
 }
@@ -520,9 +862,9 @@ function handleRowButtons(eventObject) {
       if (actionButtonType === 'All') {
 
           // remove it from the array if it is odd
-          allRowsArray[rowNumber] === undefined
-          ? (allRowsArray[rowNumber] = [selectedDigit])
-          : allRowsArray[rowNumber].push(selectedDigit);
+          allUserSelections[rowNumber] === undefined
+          ? (allUserSelections[rowNumber] = [selectedDigit])
+          : allUserSelections[rowNumber].push(selectedDigit);
 
         // de-select it in the row
         $(rowSlot).addClass(`selected`);
@@ -531,9 +873,9 @@ function handleRowButtons(eventObject) {
       }else{
 
           // remove it from the array if it is odd
-          ((allRowsArray[rowNumber] !== undefined)
-          && allRowsArray[rowNumber].includes(selectedDigit)) &&
-          arrayRemove(allRowsArray[rowNumber],selectedDigit)
+          ((allUserSelections[rowNumber] !== undefined)
+          && allUserSelections[rowNumber].includes(selectedDigit)) &&
+          arrayRemove(allUserSelections[rowNumber],selectedDigit)
           
   
         // de-select it in the row
@@ -543,8 +885,7 @@ function handleRowButtons(eventObject) {
     }
 
 
-      // log the result to the console.log 
-      console.log(allRowsArray)
+     
   }
 
 
@@ -554,15 +895,15 @@ function handleRowButtons(eventObject) {
 
     
         // make sure atleast slot is selected
-        if (allRowsArray[rowNumber] === undefined) return;
+        if (allUserSelections[rowNumber] === undefined) return;
         
       
         // If there are no slots to clear, return and log a message.
-        if (allRowsArray[rowNumber].length === 0) return;
+        if (allUserSelections[rowNumber].length === 0) return;
 
         
         // clear all the slots of {rowNumber}
-        allRowsArray[rowNumber] = [];
+        allUserSelections[rowNumber] = [];
 
         // de-select all selected slots
         for (let index = 0; index < 10; index++) {
@@ -574,6 +915,10 @@ function handleRowButtons(eventObject) {
           
         
         }
+
+
+        // handle the combination when the selection is cleared
+        handleBetCombination();
 
   
   }
@@ -645,7 +990,7 @@ function handleRowButtons(eventObject) {
     if(locallyStoredTime !== undefined){
       if(locallyStoredTime !== countDownTimer){
         
-        console.log('here')
+       
         countDownTimer = locallyStoredTime
         $('#draw-lot').text(locallyStoredDrawlots)
 

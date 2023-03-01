@@ -36,10 +36,30 @@
 
 
 
+    <div class="betLeftList" style=""><div class="search-box-wrapper search-box-left-menu"><div class="el-dropdown"><div class="search-content-box el-dropdown-selfdefine" aria-haspopup="list" aria-controls="dropdown-menu-2119" role="button" tabindex="0"><input placeholder="Enter search content"> <div class="clear-icon opacity0"></div></div> <ul class="el-dropdown-menu el-popper search-drop-box" id="dropdown-menu-2119" style="display: none;"><li tabindex="-1" class="el-dropdown-menu__item"><!----><div class="search-container"><!----> <div class="history"><p class="search-title">Top Searches</p> <ul class="history-list no-padding-bottom"><li>Rapid Racer</li><li>Rapid 5D</li><li>Rapid Mark6</li><li>Rapid 11x5</li><li>Rapid Fast3</li><li>Rapid 3D</li><li>Rapid 2color Ball</li><li>Rapid 4D</li></ul></div></div></li></ul></div></div> <div role="tablist" aria-multiselectable="true" class="el-collapse panel-collapse"> 
+    
+        <div class="el-collapse-item is-active">
+            <div role="tab" aria-expanded="true" aria-controls="el-collapse-content-607" aria-describedby="el-collapse-content-607"><div role="button" id="el-collapse-head-607" tabindex="0" class="el-collapse-item__header is-active">Classic lotto<i class="el-collapse-item__arrow el-icon-arrow-right is-active"></i></div></div>
 
+        </div>
+        
+        <div role="tabpanel" class="el-collapse-item__wrap">
+           <div class="el-collapse-item__content">
+            <ul class="lottery-list" id="classic-lotto">
 
-<div class="container p-5 mt-5 text-white bg-info "  style = "max-width: max-content !important; border-radius
-:0px 0px 8px 8px;" >
+             
+                
+                
+            </ul>
+           </div> 
+
+        </div>
+
+    </div></div>
+
+<div style="margin-left:250px">
+<div class="container p-5 mt-5 text-white bg-info "  style = "max-width: max-content !important; border-radius 
+:0px 0px 8px 8px; " >
 
 
 
@@ -60,6 +80,7 @@
 </div>
 
 <h1 id="draw-lot" style="font-size:xxx-large"></h1>
+<h1 id="draw-lot" style="font-size:xxx-large"></h1>
 
 </li>
 
@@ -67,64 +88,29 @@
 
  <div style="max-width:800px;" class="bg-info" id="root-parent">
 
-    <ul class="play-method wuxing">
-        <li>
-            <span class="play-method__title wuxingzhixuan">Straight</span> <div class="play-method__item-wrap"><div class="play-method__item " >
-        All 5 Straight(Joint)
-    </div>
-    <div class="play-method__item">
-        All 5 Straight(Manual)
-    </div>
-    
-    <div class="play-method__item">
-        All 5 Straight(Combo)
-    </div></div></li>
-    
-    <li><span class="play-method__title wuxingzuxuan">Group</span>
-    <div class="play-method__item-wrap">
-    <div class="play-method__item current">
-        All 5 Group 120
-    </div>
-    <div class="play-method__item">
-        All 5 Group 60
-    </div>
-    <div class="play-method__item">
-        All 5 Group 30
-    </div>
-    <div class="play-method__item">
-        All 5 Group 20
-    </div>
-    <div class="play-method__item">
-        All 5 Group 10
-    </div>
-    <div class="play-method__item">
-        All 5 Group 5
-    </div>
-</div>
-</li>
-</ul>
-</div>
 
+    <div class="scrollWrapper" style="background-image: linear-gradient(180deg,rgba(80,41,178,.35) 18%,rgba(55,53,255,.35));">
+        <div class="play-group__scroll-wrap">
 
+            <ul class="play-group" id="play-group-ul">
+                
+            </ul>
+        </div>
+        <div class="slideBtnWrapper"><div class="left disable"></div> <div class="right"></div></div>
+    </div>
 
-
-
-
-   
-   
-    <!-- <span class="big">
-        Big
-    </span><span class="small">
-        Small
-    </span><span class="odd">
-        Odd
-    </span><span class="even">
-        Even
-    </span><span class="clear">
-        Clear
-    </span> -->
+    <ul class="play-method wuxing" id="play-types-parent"></ul>
+    <h3 id="how-to-play" style="font-size:medium"></h3>
+    <div id="slots-wrapper"></div>
 
 </div>
+
+
+
+
+
+
+
 
 
 
@@ -133,7 +119,7 @@
 
 <div data-v-e4542d96="" id="moneyMode" style="margin-bottom: 20px"><label data-v-e4542d96="" class="moneyMode__label" style="margin-top:10px ;">Each bet</label>
      <div data-v-e4542d96="" class="bet-amounts-parent">
-        <span data-v-e4542d96="" class="amount">2</span>
+        <span data-v-e4542d96="" class="amount active">2</span>
         <span data-v-e4542d96="" class="amount">1</span>
         <span data-v-e4542d96="" class="amount">0.2</span>
         <span data-v-e4542d96="" class="amount">0.1</span>
@@ -151,6 +137,7 @@
     <div style="margin-top: 20px" data-v-e4542d96="" id="bet-now" class="el-tooltip btn btn-bet item" aria-describedby="el-tooltip-671" tabindex="0">Bet now</div>
   </li>
 
+</div>
 
 </body>
 

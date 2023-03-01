@@ -1,5 +1,260 @@
 
 
+.el-collapse .panel-collapse{
+    font-family: PingFang SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
+    font-size: 14px;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    border-top: 1px solid #ebeef5;
+    border-bottom: 1px solid #ebeef5;
+}
+
+
+.el-collapse-item{
+
+
+    font-family: PingFang SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
+    font-size: 14px;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+
+}
+
+
+
+
+.el-collapse-item__header{
+
+
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    cursor: pointer;
+    border-bottom: 1px solid #ebeef5;
+    transition: border-bottom-color .3s;
+    outline: 0;
+    border-bottom-color: transparent;
+    height: 40px;
+    line-height: 40px;
+    font-family: PingFangSC-Regular;
+    font-size: 13px;
+    letter-spacing: 0;
+    padding-left: 20px;
+    background: #e8e0fd;
+    color: #7461cf;
+    font-weight: 700;
+
+
+}
+
+.el-collapse-item_wrap{
+    font-family: PingFang SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
+    font-size: 14px;
+    padding: 0;
+    margin: 0;
+    will-change: height;
+    background-color: #fff;
+    overflow: hidden;
+    border-bottom: 1px solid #ebeef5;
+    -webkit-box-sizing: border-box;
+}
+
+.el-collapse-item__content{
+    font-family: PingFang SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    font-size: 13px;
+    color: #303133;
+    line-height: 1.769230769230769;
+    padding-bottom: 0;
+    background: #fbfaff;
+}
+
+.lottery-list{
+    font-family: PingFang SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
+    font-size: 13px;
+    color: #303133;
+    line-height: 1.769230769230769;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+
+.list-seriesName{
+    font-family: PingFang SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
+    list-style: none;
+    color: #706aa8;
+    line-height: 30px;
+    font-size: 12px;
+    cursor: pointer;
+    box-sizing: border-box;
+    margin: 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 9px 10px;
+}
+.series{
+    font-family: PingFang SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
+    list-style: none;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    color: #706aa8;
+    line-height: 30px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.lottery-list-active {
+
+    font-family: PingFang SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
+list-style: none;
+box-sizing: border-box;
+padding: 0;
+margin: 0;
+color: #706aa8;
+line-height: 30px;
+font-size: 12px;
+cursor: pointer;
+background-color: #f5f2ff;
+}
+
+
+
+.list-ticketName {
+
+    font-family: PingFang SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
+    color: #706aa8;
+    line-height: 30px;
+    font-size: 12px;
+    cursor: pointer;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    transition: height .4s;
+    overflow: hidden;
+    height: 150px;
+   
+
+}
+
+.hidden{
+    height: 0!important; 
+    transition: height .4s;
+}
+
+
+.lenMore{
+    color: #706aa8;
+    font-size: 12px;
+    cursor: pointer;
+    list-style: none;
+    box-sizing: border-box;
+    padding: 0 7px;
+    margin: 0 auto 5px;
+    height: 30px;
+    width: 108px;
+    white-space: normal;
+    display: flex;
+    border-radius: 6px;
+    align-items: center;
+    position: relative;
+    margin-top: 0;
+    font-family: DINAlternate;
+    line-height: 12px;
+}
+
+
+.seriesName{
+    font-family: PingFang SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
+    list-style: none;
+    cursor: pointer;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    width: 80px;
+    margin-left: 5px;
+    font-size: 13px;
+    color: #706aa8;
+    line-height: 20px;
+}
+
+.ticketName{
+    cursor: pointer;
+    list-style: none;
+    white-space: normal;
+    font-family: DINAlternate;
+    line-height: 12px;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    color: #5b6186;
+    font-size: 12px;
+}
+
+.el-collapse-item__arrow .el-icon-arrow-right .is-active{
+
+    cursor: pointer;
+    font-size: 13px;
+    letter-spacing: 0;
+    color: #7461cf;
+    box-sizing: border-box;
+    padding: 0;
+    font-family: element-icons!important;
+    speak: none;
+    font-style: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    vertical-align: baseline;
+    display: inline-block;
+    -webkit-font-smoothing: antialiased;
+    margin: 0 8px 0 auto;
+    transition: transform .3s,-webkit-transform .3s;
+    font-weight: 300;
+    transform: rotate(0);
+}
+
+.is-active{
+    font-family: PingFang SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
+    font-size: 14px;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+.betLeftList{
+    font-family: PingFang SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
+    font-size: 14px;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    position: fixed;
+    z-index: 100;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 6px 0 rgba(0,0,0,.07);
+    width: 200px;
+    background-image: linear-gradient(180deg,#fff,#fff);
+    overflow-y: auto;
+}
+
+
+
+
+
+
 .play-method.wuxing { 
     font-family: PingFang SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
     box-sizing: border-box;
@@ -88,7 +343,7 @@ li{
 
 .current {
     background-color: #8065d8;
-    background-image: linear-gradient(180deg,hsla(0,0%,100%,.53),hsla(0,0%,100%,0) 67%) ;
+    background-image: linear-gradient(180deg,hsla(0,0%,100%,.53),hsla(0,0%,100%,0) 67%) !important ;
     color: white;
 }
 
@@ -278,4 +533,126 @@ li{
     text-align: center;
     vertical-align: top;
     cursor: pointer;
+}
+
+
+.slideBtnWrapper {
+
+
+    font-family: PingFang SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
+    font-size: 14px;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    position: absolute;
+    display: flex;
+    top: 18px;
+    right: 11px;
+
+}
+
+
+.left{
+    font-family: PingFang SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
+    font-size: 14px;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    top: 10px;
+    right: 10px;
+    width: 16px;
+    height: 24px;
+    cursor: pointer;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-image: url('../ob_lottery/left.png')!important;
+}
+
+
+
+.right {
+    font-family: PingFang SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
+    font-size: 14px;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    top: 10px;
+    right: 10px;
+    width: 16px;
+    height: 24px;
+    cursor: pointer;
+    background-image: url('../ob_lottery/right.png')!important;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: 50%;
+    margin-left: 2px;
+}
+
+
+
+
+.play-group{
+
+
+    font-family: PingFang SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
+    font-size: 14px;
+    box-sizing: border-box;
+    margin: 0;
+    list-style: none;
+    position: relative;
+    display: inline-flex;
+    height: 60px;
+    padding: 15px 0;
+    transition-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition-property: transform;
+    transition-duration: 0ms;
+    transform: translateX(0px) translateY(0px) translateZ(1px);
+
+}
+
+
+.play-group-name{
+
+
+    font-family: PingFang SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
+    list-style: none;
+    white-space: nowrap;
+    user-select: none;
+    line-height: 30px;
+    font-size: 13px;
+    cursor: pointer;
+    text-align: center;
+    font-weight: 500;
+    pointer-events: auto;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    display: block;
+    width: 100%;
+
+
+}
+
+.play-group-item-parent{
+
+    font-family: PingFang SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
+    list-style: none;
+    box-sizing: border-box;
+    margin: 0;
+    white-space: nowrap;
+    user-select: none;
+    display: flex;
+    height: 30px;
+    line-height: 30px;
+    padding: 0 10px;
+    border-radius: 6px;
+    margin-left: 8px;
+    min-width: 76px;
+    background-blend-mode: soft-light;
+    background-image: linear-gradient(180deg,hsla(0,0%,100%,0),rgba(0,0,0,.05) 99%),linear-gradient(180deg,#fff,#fff);
+    font-size: 13px;
+    cursor: pointer;
+    text-align: center;
+    pointer-events: auto;
 }

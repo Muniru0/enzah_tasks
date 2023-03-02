@@ -81,7 +81,8 @@ function getPlayMethodTypesMarkup(straightPlayMethods = [],GroupPlayMethods = []
 
   
   straightPlayMethods.forEach((playMethod,index,arry)=>{
-    playStraightMethodsMarkup +=  ` <div class="play-method__item ${index === 0 && 'current'}" id=${index}>${playMethod.playMethodName}</div>`;
+
+    playStraightMethodsMarkup +=  ` <div class="play-method__item ${index === 0 ? 'current' : ''}" id=${index}>${playMethod.playMethodName}</div>`;
   });
 
 
@@ -176,7 +177,7 @@ function getPlayMethodParentMarkup(title = '',children = []){
   // check the children markup to the {childrenMarkupString}
    children.forEach((lotteryListItemName,index,arr) =>{
 
-     childrenMarkupString +=  `<li data="ticketName81" class="lenMore"><!----> <span class="ticketName" id="${lotteryListItemName}-${index}" style="font-size: 12px;">${lotteryListItemName}</span></li>`;
+     childrenMarkupString +=  `<li data="ticketName81" class="lenMore" id="${lotteryListItemName}-${index}"><!----> <span class="ticketName"  style="font-size: 12px;">${lotteryListItemName}</span></li>`;
 
    });
 

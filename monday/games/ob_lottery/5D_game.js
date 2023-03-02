@@ -1,10 +1,10 @@
 // import the types of bets array
-import {getVerticalSlotsActionsButtonsMarkup,slots_buttons_markup,getSlotsActionsButtonsMarkup,arrayRemove,getDrawLotsMarkup,getListParentTag,getRandomNumber,getPlayMethodTypesMarkup,playMethodsGroupName,getLotteryListMarkup} from './3D_utils.js'
+import {getVerticalSlotsActionsButtonsMarkup,slots_buttons_markup,getSlotsActionsButtonsMarkup,arrayRemove,getDrawLotsMarkup,getListParentTag,getRandomNumber,getPlayMethodTypesMarkup,playMethodsGroupName,getLotteryListMarkup} from './utils/3D_utils.js'
 
-import {Game5DDataModel } from "./models/data_model.js";
+
 import { LotteryObj, PlayMethod} from "./models/classes_models.js"
-import {INSTANT_GAME,PK10, _5D, MARK6, G11x6,FAST3, G3D, NORTH_VIETLOTT,Happy8, CENTRAL_VIETLOTT, SOUTH_VIETLOTT,G2COLOR,G4D,THAILOT, PLAY_METHODS_GROUP_CONSTANT_NAME,PLAY_GROUP_CONSTANT_NAME,PLAY_METHODS_JSON_KEY} from "./3D_constants.js";
-
+import {INSTANT_GAME,PK10, _5D, MARK6, G11x6,FAST3, G3D, NORTH_VIETLOTT,Happy8, CENTRAL_VIETLOTT, SOUTH_VIETLOTT,G2COLOR,G4D,THAILOT, BASE_URL,PLAY_METHODS_GROUP_CONSTANT_NAME,PLAY_GROUP_CONSTANT_NAME,PLAY_METHODS_JSON_KEY} from "./3D_constants.js";
+import {getAll5StraightJointTotalBets} from "./utils/miscelleanous_functions.js"
 
 
 
@@ -38,7 +38,7 @@ let verticalActionsButtonsClear = "";
 let drawLotsMarkup = ''
 let numberOfSlots = 5
 let _5d 
-let playGroup 
+let lotteryPlayGroups
 
 
 
@@ -49,10 +49,11 @@ const numberOfCols = 10
 
 // declare the total number of buttons
 let allUserSelections = [];
+let allUserSelectionsBasedOnColumns = [];
 
 
 // declare variable for the selected play method
-let selectedPlayMethodObj 
+let selectedPlayMethodItemObj 
 
 
 let betType = 'roayl'
@@ -66,8 +67,8 @@ let userSelection = [ [1,0,5,7,4], [3,5,7,8,2], [3,6,8,5,4], [7,9,4,1,2], [0,2,4
 
 
 
-
-let playMethodsObjs = []
+let playMethods = []
+let playMethodsItemsObjs = []
 
 
 
@@ -80,7 +81,9 @@ $(function () {
 
 
 
-  sandboxFunction()
+ // sandboxFunction()
+
+  prepareClassicLotto()
   
 
     // task: 2
@@ -102,23 +105,39 @@ $(function () {
   // 
   
   // handle slots selections
-  $('body').on('click', '.series', function () {
+  $('body').on('click', '.list-seriesName', function () {
 
 
       // console.log(  $(this).find('.list-ticketName'))
       // return;
-    if($(this).hasClass('is-active')){
-      $(this).removeClass('is-active')
-      $(this).find('.list-ticketName').addClass('hidden')
+    if($(this).parent().hasClass('is-active')){
+      $(this).parent().removeClass('is-active')
+      $(this).parent().find('.list-ticketName').addClass('hidden')
       return;
     }
 
 
     $('.is-active').removeClass('active')
-    $(this).addClass('is-active')
-    $(this).find('.list-ticketName').removeClass('hidden')
+    $(this).parent().addClass('is-active')
+    $(this).parent().find('.list-ticketName').removeClass('hidden')
     
   });
+
+
+
+
+   // handle slots selections
+   $('body').on('click', '.lenMore', function () {
+
+    //get the clicked element and get its attr:ID
+    let lotteryListItemName = $(this).attr('id').split("-")[0]
+
+    console.log(lotteryListItemName)
+  
+    //use the ID to get the appropriate json data object to load 
+    handleBetSpacePreparation(lotteryListItemName)
+  
+});
 
 
   // handle play group change
@@ -129,17 +148,20 @@ $(function () {
     $(this).parent().addClass('current')
 
     // get the position of the play group
-    const _playGroupPosition = $(this).attr('id').split('-').pop()
-    console.log(_playGroupPosition)
+    const playMethodPos = $(this).attr('id').split('-')[1]
+    console.log(playMethodPos)
 
    
     
-    
-     handlePlayGroupChange(_5d.playGroups[0].playMethods[_playGroupPosition] )
+    console.log(lotteryPlayGroups)
+
+     handlePlayMethodChange(playMethods[playMethodPos])
 
 
 
   });
+
+
 
 
   // handle slots selections
@@ -152,11 +174,6 @@ $(function () {
     handleRowButtons(this);
     
   });
-
-
-
-
-
 
 
 
@@ -179,7 +196,9 @@ $(function () {
   
 
   // change the bet method
-  $('.play-method__item').click(function () {
+  $(document).on('click', '.play-method__item', function () {
+
+    console.log('he')
 
     if($(this).hasClass('current')) return
 
@@ -188,10 +207,10 @@ $(function () {
     $(this).addClass('current')
 
     // update the current play method
-    selectedPlayMethodObj = playMethodsObjs[parseInt($(this).attr('id'))]
+    selectedPlayMethodItemObj = playMethodsItemsObjs[parseInt($(this).attr('id'))]
     
     // prepare the bets space
-     prepareBetSpace(selectedPlayMethodObj)
+     prepareBetSpace(selectedPlayMethodItemObj)
 
  });
 
@@ -203,128 +222,25 @@ $(function () {
   // respond to the ball-item click
   
 
-function sandboxFunction(breaker = 0){
+async function sandboxFunction(breaker = 0){
 
 
 
   
-lotteries.forEach((lotteryHeader,index,arr) => {
+  
 
-    
-   // list out the classic lotteries 
-   $("#classic-lotto").append(getLotteryListMarkup(lotteryHeader,lotteriesListItems [index]))
-   
 
-});
+
+  
+
+
 
 
  
 
-  let gamesObj = {};
-  const game5d_data_model = Game5DDataModel
-
-  const gamesJsonDataModel =  JSON.parse(JSON.stringify(game5d_data_model));
-
-    gamesJsonDataModel.forEach((game,gameIndex,gameArr)=>{
-           
-           if(game['lotteryName'] == _5D){
-               gamesObj[game['lotteryName']] = new LotteryObj(game)
-              
-           }
-       });
-           
-
-
-
-
-    _5d = gamesObj[_5D].LotteryJsonObj
-   const playGroups = _5d.playGroups
-
-
   
-  
-   if(Array.isArray(playGroups)){
-    
 
-    // check if the play groups are available(e.g Rapid 5D,hanoi, etc)
-    if(playGroups[0] === undefined) return
-    
-
-    // since this is just an init, get the first play group (i.e Rapid 5D)
-     playGroup = playGroups[0]
-
-    // get all the play methods names under the play group (e.g. All 5, All 4 ,All 3)
-    playGroup.playMethodsNames.forEach((item,index,arr)=>{
-      $("#play-group-ul").append(playMethodsGroupName(item,index,`${_5d.lotteryName}-${playGroup.playGroupName}-${index}`))
-    });
-    
-    
-
-    
-    // get the straight types of play methods
-    const straightPlayMethod = playGroup.playMethods[0].Straight
-
-    // get the group types of play methods
-    const GroupPlayMethod = playGroup.playMethods[0].Group
-  
-    // get the other types of play methods
-    const otherPlayMethod = playGroup.playMethods[0].other
-   
-          
-    // turn the json data of the play methods into play methods
-    // objects : Straight
-        if(straightPlayMethod !== undefined){
-          straightPlayMethod.forEach((item,index,arr)=>{
-          
-            // set the defalut play Method obj
-            index === 0 && (selectedPlayMethodObj = item)
-          playMethodsObjs.push(new PlayMethod(item))
-
-        })
-
-      }
-
-
-      // :Group
-      if(GroupPlayMethod !== undefined){
-
-        GroupPlayMethod.forEach((item,index,arr)=>{
-
-          playMethodsObjs.push(new PlayMethod(item))
-
-        })
-      }
-
-
-      // : Other
-      if(otherPlayMethod !== undefined){
-
-        otherPlayMethod.forEach((item,index,arr)=>{
-
-          playMethodsObjs.push(new PlayMethod(item))
-
-        })
-      }
-
-   $("#play-types-parent").append(getPlayMethodTypesMarkup(straightPlayMethod,GroupPlayMethod))
-
-          
-
-   
-      
-
-    
-   }
-
-
-   console.log(playMethodsObjs)
-
-   // after traversing the data model, prepare the bet space.
-   prepareBetSpace()
-
-
-
-   
+ 
   
 
 
@@ -332,33 +248,141 @@ lotteries.forEach((lotteryHeader,index,arr) => {
 }
 
 
-
- function handlePlayGroupChange(_playGroup = playGroup){
+function prepareClassicLotto(){
+ 
   
+
+lotteries.forEach((lotteryHeader,index,arr) => {
+
+    
+  // list out the classic lotteries 
+  $("#classic-lotto").append(getLotteryListMarkup(lotteryHeader,lotteriesListItems [index]))
+  
+
+});
+
+
+}
+
+
+
+
+
+// handle bet space preparation
+ async function handleBetSpacePreparation(jsonDataPath = ""){
+
+
+  if(jsonDataPath === "") {
+
+    console.log('This is unknown in our environment')
+    return;
+  }
+
+  let lotteryData 
+      const convertedLotteryName = jsonDataPath.replace(" ","_").toLocaleLowerCase()
+  try {
+
+    console.log(jsonDataPath.replace(" ","_").toLocaleLowerCase())
+    const response = await fetch(`${BASE_URL}${convertedLotteryName}.json`);
+    lotteryData = await response.json();
+   
+  } catch (error) {
+    console.log(error)
+    console.log(`Data Model not available for ${jsonDataPath}.`);
+    return;
+  }
+
+
+   if(lotteryData.length < 1){
+
+      console.log(`No Information available for ${jsonDataPath}.`)  
+    return;
+
+   }
+
+     lotteryPlayGroups =  (JSON.parse(JSON.stringify(lotteryData))).playGroups;
+
+    
+
+ 
+   if(Array.isArray(lotteryPlayGroups)){
+    
+    
+    // check if the play groups are available(e.g Rapid 5D,hanoi, etc)
+    if(lotteryPlayGroups[0] === undefined) return
+    
+
+    let playGroup = lotteryPlayGroups[0]
+
+
+
+     // get all the play methods names under the play group (e.g. All 5, All 4 ,All 3)
+     playGroup.playMethodsNames.forEach((item,index,arr)=>{
+      $("#play-group-ul").append(playMethodsGroupName(item,index,`${playGroup.playGroupName}-${index}`))
+    });
+    
+
+    // add all the available play methods to the play methods array
+    playMethods = playGroup.playMethods;
+
+
+  
+     // initialize the play group with the first play method
+     handlePlayMethodChange(playGroup.playMethods[0])
+
+
+    
+   
+      
+
+    
+   }
+
+
+  //  console.log(playMethodsItemsObjs)
+
+  //  // after traversing the data model, prepare the bet space.
+  //  prepareBetSpace()
+
 
 
    
+
+
+ }
+
+
+
+
+
+
+ function handlePlayMethodChange(playMethod){
+  
+
+
+    
+    
     // get the straight types of play methods
-    const straightPlayMethod = _playGroup.playMethods[0].Straight
+    const straightPlayMethod = playMethod.Straight
 
     // get the group types of play methods
-    const GroupPlayMethod = _playGroup.playMethods[0].Group
+    const GroupPlayMethod = playMethod.Group
   
     // get the other types of play methods
-    const otherPlayMethod = _playGroup.playMethods[0].other
+    const otherPlayMethod = playMethod.other
    
-
-
-    playMethodsObjs = []
-          
+    // clear all the play methods Items objs
+    playMethodsItemsObjs = [];
+    
+    
     // turn the json data of the play methods into play methods
     // objects : Straight
         if(straightPlayMethod !== undefined){
           straightPlayMethod.forEach((item,index,arr)=>{
           
             // set the defalut play Method obj
-            index === 0 && (selectedPlayMethodObj = item)
-          playMethodsObjs.push(new PlayMethod(item))
+            index === 0 && (selectedPlayMethodItemObj = item)
+          playMethodsItemsObjs.push(new PlayMethod(item))
 
         })
 
@@ -370,7 +394,7 @@ lotteries.forEach((lotteryHeader,index,arr) => {
 
         GroupPlayMethod.forEach((item,index,arr)=>{
 
-          playMethodsObjs.push(new PlayMethod(item))
+          playMethodsItemsObjs.push(new PlayMethod(item))
 
         })
       }
@@ -381,16 +405,28 @@ lotteries.forEach((lotteryHeader,index,arr) => {
 
         otherPlayMethod.forEach((item,index,arr)=>{
 
-          playMethodsObjs.push(new PlayMethod(item))
+          playMethodsItemsObjs.push(new PlayMethod(item))
 
         })
       }
 
-   $("#play-types-parent").empty()
-   $("#play-types-parent").append(getPlayMethodTypesMarkup(straightPlayMethod,GroupPlayMethod))
 
-          
 
+
+      // empty the play method items parent 
+      $("#play-types-parent").empty()
+
+  
+      // add the the play method items to the parent
+      $("#play-types-parent").append(getPlayMethodTypesMarkup(straightPlayMethod,GroupPlayMethod))
+
+
+      
+      //prepare the slots space for the default or first play method
+      prepareBetSpace(selectedPlayMethodItemObj)
+
+        
+  
    
       
 
@@ -398,14 +434,13 @@ lotteries.forEach((lotteryHeader,index,arr) => {
    }
 
 
-   // after traversing the data model, prepare the bet space.
-   prepareBetSpace()
+
   
 
 
 
   // prepare the bet space
- function prepareBetSpace(playMethodObj = playMethodsObjs[0]){
+ function prepareBetSpace(playMethodObj = playMethodsItemsObjs[0]){
 
 
    // clear all the selections 
@@ -427,6 +462,10 @@ lotteries.forEach((lotteryHeader,index,arr) => {
     
 
  }
+
+
+
+
 
 
   function checkAndGetBetInfo(row1 = [2,3,4,5,6,7,8,9],row2 = [8,7,9,2,3,4,5],selections = [1,3],run = true){
@@ -473,6 +512,11 @@ lotteries.forEach((lotteryHeader,index,arr) => {
 
 }
 
+
+
+
+
+
 function getCombinations(array, r){
   const result = [];
  
@@ -516,6 +560,8 @@ function getCombinations(array, r){
   }
   return mergedArr;
   }
+
+
 
 function machineAndUserSelection(run = false) {
     
@@ -607,14 +653,16 @@ function prepareSlots(numRows = numberOfRows,numCols = numberOfCols) {
     if (!run) return;
 
   for (let index = 0; index < 10; index++) {
-     // build the all vertical buttons
+    
+    // build the all vertical buttons
     verticalActionsButtonsAll = verticalActionsButtonsAll.concat(' ',getVerticalSlotsActionsButtonsMarkup(index,4))
 
+    // build the clear vertical buttons
     verticalActionsButtonsClear = verticalActionsButtonsClear.concat(' ',getVerticalSlotsActionsButtonsMarkup(index,5,'Clear'))
     
 
     
-  }
+    }
           // add the vertical actions buttons
          $('#root-parent').append(getListParentTag(9 , verticalActionsButtonsAll))
          $('#root-parent').append(getListParentTag(9 , verticalActionsButtonsClear))
@@ -639,8 +687,12 @@ function updateListOfSlots() {
  */
 function selectASlot(slotObject) {
 
+
+
   // Visually highlight the slot selection
   $(slotObject).addClass("selected");
+
+
   
   // Get the row number and selected slot digit
   let rowNumberAndColumn = getSlotRowAndColumn(slotObject);
@@ -648,6 +700,10 @@ function selectASlot(slotObject) {
 
     // get the row number
     let rowNumber = rowNumberAndColumn[0]
+
+
+    // get the column number
+    let columnNumber = rowNumberAndColumn[1]
 
   // check if the row already exists
   if (allUserSelections[rowNumber] !== undefined) {
@@ -677,11 +733,29 @@ function selectASlot(slotObject) {
     ? (allUserSelections[rowNumber] = [selectedSlot])
     : allUserSelections[rowNumber].push(selectedSlot);
 
+  console.log(selectedPlayMethodItemObj.betPlan)
+   
+  if(!getBetPlanConformity(selectedPlayMethodItemObj.betPlan)) {
+
+    console.log('Keep selecting to win money....')
+    return;
+  }
+
+ 
+   if(selectedPlayMethodItemObj.customFunction === undefined){
+
+     // handle combinations
+      handleBetCombination();
 
 
+   }else{
 
-    // handle combinations
-     handleBetCombination();
+    // decide which one of the custom bet functions to execute
+    decideAndExecuteCustomBetsCalculatingFunction()
+
+   }
+
+   
 
     // All group 60
   //  checkAndGetBetInfo(allUserSelections[0],allUserSelections[1],[1,3],false)
@@ -693,9 +767,74 @@ function selectASlot(slotObject) {
 }
 
 
+// deciding which one of the custom bet functions to execute
+function decideAndExecuteCustomBetsCalculatingFunction(){
+
+
+  // declare a function scope variable to hold the totalBetsCount
+  let totalBetsCount = 0;
+
+  // identify the function via the play method item name,
+  // call the function with the necessary params and set
+  // the result to the {totalBetsCount}
+  switch (selectedPlayMethodItemObj.playMethodName ) {
+    case "All 5 Straight(Joint)":
+      totalBetsCount = getAll5StraightJointTotalBets(allUserSelections)
+      break;
+  
+    default: return 0
+     
+  }
+
+
+  updateTotalNumberOfBets(totalBetsCount)
+
+
+
+}
+
+
+
+
+// handle the updating of the total num of bets:
+ function updateTotalNumberOfBets(totalBetsCount  = 0) {
+
+  // update the total number of bets
+  $("#total-bets-count").text(totalBetsCount)
+
+
+  // update the total bet amount 
+  $('#total-amount').text(totalBetsCount * parseInt($(".bet-amounts-parent").find(".active")[0].innerHTML))
+
+
+}
+
+
+// interpret the betPlan 
+function getBetPlanConformity(betPlan = [],){
+
+
+    // check the required number of rows selection 
+    if(betPlan[0] == 0 ) return false;
+
+    // check that the number of rows selections matches
+    if(allUserSelections.length !== betPlan[0]) return false;
+
+
+
+    return true;
+
+    //check if some columns shouldn't be repeated 
+    // let repetitions = betPlan[1]
+    // repetitions.forEach()
+
+
+
+}
+
 
 // function to handle all group 120 selections
-function handleBetCombination(playMethodObj = playMethodsObjs[0]){
+function handleBetCombination(playMethodObj = playMethodsItemsObjs[0]){
   
     
     if(allUserSelections.length !== playMethodObj.betPlan.length){
@@ -751,6 +890,8 @@ function getSelectedSlotDigit(eventObject) {
 }
 
 
+
+
 /**
  * Select all odd-numbered slots in the row of the clicked slot.
  * Clears any previously selected slots.
@@ -776,7 +917,7 @@ function handleRowButtons(eventObject) {
     // handle the vertical buttons click events
     if(actionDirection === 'v'){
         
-        handleVerticalRowButtons(rowNumberAndButtonType)
+        handleVerticalColumnButtons(rowNumberAndButtonType)
 
         return;
     }
@@ -833,8 +974,16 @@ function handleRowButtons(eventObject) {
   }
 
 
-  // perform the combination of the row buttons selection
-  handleBetCombination(selectedPlayMethodObj);
+  if(!getBetPlanConformity(selectedPlayMethodItemObj.betPlan)) {
+
+    console.log('Keep selecting to win money....')
+    return;
+  }
+
+  updateTotalNumberOfBets(getAll5StraightJointTotalBets(allUserSelections))
+
+  // // perform the combination of the row buttons selection
+  // handleBetCombination(selectedPlayMethodItemObj);
 
 
  
@@ -843,8 +992,8 @@ function handleRowButtons(eventObject) {
 }
 
 
-  //
-  function handleVerticalRowButtons(actionAndRowNumber){
+  // handle the vertical Column buttons
+  function handleVerticalColumnButtons(actionAndRowNumber){
 
       
 

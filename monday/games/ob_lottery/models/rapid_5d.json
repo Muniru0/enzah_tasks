@@ -1,12 +1,6 @@
-
-
-const Game5DDataModel =
-[
-	{
-	"lotteryName": "5D",
-	"playGroups": [{
+{"playGroups": [{
 		"playGroupName": "Rapid5D",
-		"playMethodsNames": ["All 5","All 4","All 3","Mid 3","Last3","First 3","Last 2","Fixed place","Any Place","B/S/O/E","Fun","Pick 2","Pick 3","Pick 4","Dragon/Tiger","Stud","Three cards","Bull Bull",],
+		"playMethodsNames": ["All 5","All 4","All 3","Mid 3","Last3","First 3","Last 2","Fixed place","Any Place","B/S/O/E","Fun","Pick 2","Pick 3","Pick 4","Dragon/Tiger","Stud","Three cards","Bull Bull"],
 		"playMethods": [
 			{
 				"playMethodsGroupName": "All 5",
@@ -14,7 +8,8 @@ const Game5DDataModel =
 						"playMethodName": "All 5 Straight(Joint)",
 						"numberOfRows": 5,
 						"basePrize": 162,
-						"betPlan": [1,1,1,1,1],
+						"betPlan": [5],
+						"customFunction":"",
 						"repetitions": [],
 						"sectionTitle": "Straight",
 						"howToPlay": "How to play: Select 1 No. from 1st, 2nd, 3rd, 4th, 5th form 1bet. Selected and winning No. same & in order, as win.Win Sample：Bet plan: 1, 2, 3, 4, 5; Winning No.: 1, 2, 3, 4, 5, as win"
@@ -137,7 +132,7 @@ const Game5DDataModel =
                     "repetitions": [],
                     "sectionTitle": "Straight",
                     "howToPlay": "How to play: Select 1 No. from 1st, 2nd, 3rd, 4th, 5th form all 1~5 combo. Total 5bets. Selected 5th and winning No. same, as win 5th Fixed Place; Selected 4th, 5th and winning No. same, as win 5th Fixed Place, Last2 Straight & so on. Maximum 5 prizes at one time. Win Sample：Bet plan: 1, 2, 3, 4, 5; Winning No.: 1, 2, 3, 4, 5, as win -, -, -, -, 5/-, -, -, 4, 5/-, -, 3, 4, 5/-, 2, 3, 4, 5/1, 2, 3, 4, 5; Each 1 bet."
-                },],
+                }],
 				"Group": [
                    
 
@@ -238,7 +233,7 @@ const Game5DDataModel =
                     "repetitions": [],
                     "sectionTitle": "Straight",
                     "howToPlay": "How to play: Select 1 No. from 1st, 2nd, 3rd, 4th, 5th form all 1~5 combo. Total 5bets. Selected 5th and winning No. same, as win 5th Fixed Place; Selected 4th, 5th and winning No. same, as win 5th Fixed Place, Last2 Straight & so on. Maximum 5 prizes at one time. Win Sample：Bet plan: 1, 2, 3, 4, 5; Winning No.: 1, 2, 3, 4, 5, as win -, -, -, -, 5/-, -, -, 4, 5/-, -, 3, 4, 5/-, 2, 3, 4, 5/1, 2, 3, 4, 5; Each 1 bet."
-                },],
+                }],
 
                 "Group": [
                    
@@ -311,8 +306,4 @@ const Game5DDataModel =
 	}]
 
 }
-
-]
-
-export {Game5DDataModel}
 

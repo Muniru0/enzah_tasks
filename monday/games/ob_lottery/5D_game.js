@@ -1,10 +1,10 @@
 // import the types of bets array
-import {getVerticalSlotsActionsButtonsMarkup,slots_buttons_markup,getSlotsActionsButtonsMarkup,arrayRemove,getDrawLotsMarkup,getListParentTag,getRandomNumber,getPlayMethodTypesMarkup,playMethodsGroupName,getLotteryListMarkup} from './utils/3D_utils.js'
+import {getVerticalSlotsActionsButtonsMarkup,slots_buttons_markup,getSlotsActionsButtonsMarkup,arrayRemove,getDrawLotsMarkup,getListParentTag,getRandomNumber,getPlayMethodTypesMarkup,playMethodsGroupName,getLotteryListMarkup,getCombinations} from './utils/utils.js'
 
 
 import { LotteryObj, PlayMethod} from "./models/classes_models.js"
 import {INSTANT_GAME,PK10, _5D, MARK6, G11x6,FAST3, G3D, NORTH_VIETLOTT,Happy8, CENTRAL_VIETLOTT, SOUTH_VIETLOTT,G2COLOR,G4D,THAILOT, BASE_URL,PLAY_METHODS_GROUP_CONSTANT_NAME,PLAY_GROUP_CONSTANT_NAME,PLAY_METHODS_JSON_KEY} from "./3D_constants.js";
-import {getAll5StraightJointTotalBets} from "./utils/miscelleanous_functions.js"
+import {getAll5StraightJointTotalBets,getAll5StraightComboTotalBets,getGroup120TotalBets} from "./utils/miscelleanous_functions.js"
 
 
 
@@ -105,7 +105,7 @@ $(function () {
   // 
   
   // handle slots selections
-  $('body').on('click', '.list-seriesName', function () {
+  $(document).on('click', '.list-seriesName', function () {
 
 
       // console.log(  $(this).find('.list-ticketName'))
@@ -127,7 +127,7 @@ $(function () {
 
 
    // handle slots selections
-   $('body').on('click', '.lenMore', function () {
+   $(document).on('click', '.lenMore', function () {
 
     //get the clicked element and get its attr:ID
     let lotteryListItemName = $(this).attr('id').split("-")[0]
@@ -141,7 +141,7 @@ $(function () {
 
 
   // handle play group change
-  $('body').on('click', '.play-group-name', function () {
+  $(document).on('click', '.play-group-name', function () {
     
     // provide a visual change
     $('.current').removeClass('current')
@@ -152,8 +152,8 @@ $(function () {
     console.log(playMethodPos)
 
    
+    console.log(playMethodsItemsObjs)
     
-    console.log(lotteryPlayGroups)
 
      handlePlayMethodChange(playMethods[playMethodPos])
 
@@ -165,12 +165,12 @@ $(function () {
 
 
   // handle slots selections
-  $('body').on('click', '.ball-item', function () {
+  $(document).on('click', '.ball-item', function () {
     selectASlot(this);
   });
 
   // handle row buttons
-  $('body').on('click', '.row-btns', function () {
+  $(document).on('click', '.row-btns', function () {
     handleRowButtons(this);
     
   });
@@ -208,6 +208,7 @@ $(function () {
 
     // update the current play method
     selectedPlayMethodItemObj = playMethodsItemsObjs[parseInt($(this).attr('id'))]
+    
     
     // prepare the bets space
      prepareBetSpace(selectedPlayMethodItemObj)
@@ -360,7 +361,7 @@ lotteries.forEach((lotteryHeader,index,arr) => {
   
 
 
-    
+    console.log(playMethod)
     
     // get the straight types of play methods
     const straightPlayMethod = playMethod.Straight
@@ -517,31 +518,6 @@ lotteries.forEach((lotteryHeader,index,arr) => {
 
 
 
-function getCombinations(array, r){
-  const result = [];
- 
-  // Recursive function to generate combinations
-  function generateCombos(combination, index) {
-    if (combination.length === r) {
-      result.push(combination);
-      return;
-    }
- 
-    if (index >= array.length) {
-      return;
-    }
- 
-    const newCombo = [...combination];
-    newCombo.push(array[index]);
- 
-    generateCombos(newCombo, index + 1);
-    generateCombos(combination, index + 1);
-
-  }
- 
-  generateCombos([], 0);
-  return result;
-}
 
 
 
@@ -587,7 +563,7 @@ function machineAndUserSelection(run = false) {
 }
 
 
-function prepareSlots(numRows = numberOfRows,numCols = numberOfCols) {
+function prepareSlots(numRows = numberOfRows,numCols = numberOfCols,counterMaxValue = 10) {
 
   let count = 0;
   let rowNumber;
@@ -630,7 +606,7 @@ function prepareSlots(numRows = numberOfRows,numCols = numberOfCols) {
     count += 1;
 
     // for efficiency append the markup in multiples of 10
-    if (count == 10) {
+    if (count == counterMaxValue) {
         buttonsMarkup = getListParentTag(
         rowNumber,
         buttonsMarkup.concat("", slotActionsButtonsMarkup)
@@ -701,17 +677,16 @@ function selectASlot(slotObject) {
     // get the row number
     let rowNumber = rowNumberAndColumn[0]
 
-
-    // get the column number
-    let columnNumber = rowNumberAndColumn[1]
-
+    let actionType = true
   // check if the row already exists
   if (allUserSelections[rowNumber] !== undefined) {
     
     // if it does and include's the selected slot
     if (allUserSelections[rowNumber].includes(selectedSlot)) {
-      
-      // de-select the slot
+
+        actionType = false
+
+        // de-select the slot
         if ($(slotObject).hasClass("selected")) {
         
         $(slotObject).removeClass("selected");
@@ -720,29 +695,37 @@ function selectASlot(slotObject) {
        
         // remove the slot from the array
          arrayRemove(allUserSelections[rowNumber], selectedSlot);
+        
 
-         // return afterwards to prevent selecting the slot again
-         return;
+        
+        
     }
   }
 
-  console.log('how')
+    if(actionType){
 
-  // add the bet slot selected to the appropriate array
+      // add the bet slot selected to the appropriate array
      allUserSelections[rowNumber] === undefined
-    ? (allUserSelections[rowNumber] = [selectedSlot])
-    : allUserSelections[rowNumber].push(selectedSlot);
-
-  console.log(selectedPlayMethodItemObj.betPlan)
+     ? (allUserSelections[rowNumber] = [selectedSlot])
+     : allUserSelections[rowNumber].push(selectedSlot);
    
-  if(!getBetPlanConformity(selectedPlayMethodItemObj.betPlan)) {
+    }
 
-    console.log('Keep selecting to win money....')
-    return;
-  }
+  
 
+
+
+    // make sure the bet selections are formoative
+    if(!isBetRuleConformitive(selectedPlayMethodItemObj.numberOfRows,selectedPlayMethodItemObj.minSelectionPerRow)) {
  
-   if(selectedPlayMethodItemObj.customFunction === undefined){
+      // update the total bets count
+      updateTotalNumberOfBets()
+      return;
+    }
+ 
+
+    // check and handle the total bets count via custom function or via combination.
+   if(selectedPlayMethodItemObj.totalNumberOfBetsFunctionFlag === undefined){
 
      // handle combinations
       handleBetCombination();
@@ -751,24 +734,27 @@ function selectASlot(slotObject) {
    }else{
 
     // decide which one of the custom bet functions to execute
-    decideAndExecuteCustomBetsCalculatingFunction()
+    getTotalNumberOfBets()
 
    }
 
-   
-
-    // All group 60
-  //  checkAndGetBetInfo(allUserSelections[0],allUserSelections[1],[1,3],false)
-
-  // log all the selected bets
-  console.log(allUserSelections);
+ 
+ 
+ 
+  
+ 
 
 
 }
 
 
+
+
+
+
+
 // deciding which one of the custom bet functions to execute
-function decideAndExecuteCustomBetsCalculatingFunction(){
+function getTotalNumberOfBets(){
 
 
   // declare a function scope variable to hold the totalBetsCount
@@ -777,16 +763,26 @@ function decideAndExecuteCustomBetsCalculatingFunction(){
   // identify the function via the play method item name,
   // call the function with the necessary params and set
   // the result to the {totalBetsCount}
-  switch (selectedPlayMethodItemObj.playMethodName ) {
+ 
+  switch (selectedPlayMethodItemObj.totalNumberOfBetsFunctionFlag) {
+
+
     case "All 5 Straight(Joint)":
       totalBetsCount = getAll5StraightJointTotalBets(allUserSelections)
-      break;
+
+    case "All 5 Straight(Combo)":
+      totalBetsCount = getAll5StraightComboTotalBets(allUserSelections)
+ 
+    case "All 5 Group 120":
+      totalBetsCount = getGroup120TotalBets(allUserSelections,5)
+ 
   
-    default: return 0
-     
+    default: totalBetsCount = 0
+    
   }
 
 
+  //update the ui with the total number of bets
   updateTotalNumberOfBets(totalBetsCount)
 
 
@@ -811,24 +807,38 @@ function decideAndExecuteCustomBetsCalculatingFunction(){
 
 
 // interpret the betPlan 
-function getBetPlanConformity(betPlan = [],){
+function isBetRuleConformitive(numRows = 0,minSelectionPerRow = 0,){
 
 
-    // check the required number of rows selection 
-    if(betPlan[0] == 0 ) return false;
+   
+   // check that the number of rows selections matches
+    if(allUserSelections.length !== numRows) return false;
 
-    // check that the number of rows selections matches
-    if(allUserSelections.length !== betPlan[0]) return false;
+      console.log("bet plan conformity rule 1 passed",allUserSelections[0]);
 
 
+   if(allUserSelections.length === 1){
+
+    if(allUserSelections[0].length < minSelectionPerRow)  return false
+
+
+    console.log('rule 2 passed.')
+    return true;
+   }
+
+
+
+  // check for the minimum number of rows for each row
+  for (let index = 0; index < allUserSelections.length; index++) {
+    if(allUserSelections[index].length < minSelectionPerRow)  return false
+  }
+
+
+    console.log('fully comformative')
 
     return true;
 
-    //check if some columns shouldn't be repeated 
-    // let repetitions = betPlan[1]
-    // repetitions.forEach()
-
-
+   
 
 }
 
@@ -837,7 +847,7 @@ function getBetPlanConformity(betPlan = [],){
 function handleBetCombination(playMethodObj = playMethodsItemsObjs[0]){
   
     
-    if(allUserSelections.length !== playMethodObj.betPlan.length){
+    if(allUserSelections.length !== selectedPlayMethodItemObj.numberOfRows){
 
       console.log('sorry user selections still not enough');
 
@@ -845,29 +855,8 @@ function handleBetCombination(playMethodObj = playMethodsItemsObjs[0]){
     }
 
 
-  let combinations = []
-  
-
-    allUserSelections.forEach((userSelection,index,arr)=>{
-      combinations.push(getCombinations(userSelection,playMethodObj.betPlan[index]))
-    });
-  
-    
-    console.log(combinations)
-
-  return
-
-   // check and merge the combinatn of both rows
-  const totalBetsCount = combtnRow2.length
-  
-    console.log(`total bets count: ${totalBetsCount}`)
-  // update the bets count 
-  $('#total-bets-count').text(totalBetsCount)
-
-
-
-  console.log(combtnRow2)
-  console.log(`Total number of bets without repetitions: ${totalBetsCount}`)
+ 
+      updateTotalNumberOfBets( (getCombinations(allUserSelections[0],selectedPlayMethodItemObj.sampleSpace)).length)
 
 
 }
@@ -954,7 +943,7 @@ function handleRowButtons(eventObject) {
       // select all the large slots
       actionButtonType === "Big" && (mySwitch = index >= 5 && index <= 9)
 
-
+      console.log(actionButtonType)
      // check and decide the action to take
       if (mySwitch) {
        
@@ -968,28 +957,56 @@ function handleRowButtons(eventObject) {
           // de-select it in the row
           $(`#${rowNumber}-${index}`).addClass(`selected`);
 
-      }
+      }        
+
 
      
   }
 
 
-  if(!getBetPlanConformity(selectedPlayMethodItemObj.betPlan)) {
 
-    console.log('Keep selecting to win money....')
-    return;
+
+  if(selectedPlayMethodItemObj.totalNumberOfBetsFunctionFlag === undefined){
+
+    // handle combinations
+     handleBetCombination();
+
+
+  }else{
+
+   // decide which one of the custom bet functions to execute
+   getTotalNumberOfBets()
+
   }
 
-  updateTotalNumberOfBets(getAll5StraightJointTotalBets(allUserSelections))
 
-  // // perform the combination of the row buttons selection
-  // handleBetCombination(selectedPlayMethodItemObj);
-
-
- 
 
 
 }
+
+
+
+// get total bets count 
+function getTotalBets(){
+
+  switch (selectedPlayMethodItemObj.customFunction) {
+    case "All 5 Straight(Joint)":
+       return getAll5StraightJointTotalBets(allUserSelections)
+
+    case "All 5 Straight(Combo)":
+       return getAll5StraightComboTotalBets(allUserSelections)
+ 
+  
+    default: return 0
+      break;
+  }
+  
+}
+
+
+
+
+
 
 
   // handle the vertical Column buttons
@@ -1015,6 +1032,13 @@ function handleRowButtons(eventObject) {
           ? (allUserSelections[rowNumber] = [selectedDigit])
           : allUserSelections[rowNumber].push(selectedDigit);
 
+           // remove it from the array if it is odd
+           allUserSelections[column] === undefined
+           ? (allUserSelections[column] = [selectedDigit])
+           : allUserSelections[column].push(selectedDigit);
+
+
+
         // de-select it in the row
         $(rowSlot).addClass(`selected`);
 
@@ -1025,6 +1049,12 @@ function handleRowButtons(eventObject) {
           ((allUserSelections[rowNumber] !== undefined)
           && allUserSelections[rowNumber].includes(selectedDigit)) &&
           arrayRemove(allUserSelections[rowNumber],selectedDigit)
+
+            // remove it from the array if it is odd
+            ((allUserSelections[column] !== undefined)
+            && allUserSelections[column].includes(selectedDigit)) &&
+            arrayRemove(allUserSelections[column],selectedDigit)
+            
           
   
         // de-select it in the row
@@ -1067,7 +1097,7 @@ function handleRowButtons(eventObject) {
 
 
         // handle the combination when the selection is cleared
-        handleBetCombination();
+        updateTotalNumberOfBets();
 
   
   }

@@ -7,9 +7,10 @@
 				"Straight": [{
 						"playMethodName": "All 5 Straight(Joint)",
 						"numberOfRows": 5,
+						"minSelectionPerRow":1,
 						"basePrize": 162,
 						"betPlan": [5],
-						"customFunction":"",
+						"totalNumberOfBetsFunctionFlag":"All 5 Straight(Joint)",
 						"repetitions": [],
 						"sectionTitle": "Straight",
 						"howToPlay": "How to play: Select 1 No. from 1st, 2nd, 3rd, 4th, 5th form 1bet. Selected and winning No. same & in order, as win.Win Sample：Bet plan: 1, 2, 3, 4, 5; Winning No.: 1, 2, 3, 4, 5, as win"
@@ -17,8 +18,8 @@
 					{
 						"playMethodName": "All 5 Straight(Manual)",
 						"numberOfRows": 0,
+						"minSelectionPerRow":0,
 						"basePrize": 162,
-						
 						"betPlan": [],
 						"repetitions": [],
 						"sectionTitle": "Straight",
@@ -28,9 +29,10 @@
 					{
 						"playMethodName": "All 5 Straight(Combo)",
 						"numberOfRows": 5,
+						"minSelectionPerRow":1,
 						"basePrize": 162,
-						"betPlan": [],
 						"repetitions": [],
+						"totalNumberOfBetsFunctionFlag":"All 5 Straight(Combo)",
 						"sectionTitle": "Straight",
 						"howToPlay": "How to play: Select 1 No. from 1st, 2nd, 3rd, 4th, 5th form all 1~5 combo. Total 5bets. Selected 5th and winning No. same, as win 5th Fixed Place; Selected 4th, 5th and winning No. same, as win 5th Fixed Place, Last2 Straight & so on. Maximum 5 prizes at one time. Win Sample：Bet plan: 1, 2, 3, 4, 5; Winning No.: 1, 2, 3, 4, 5, as win -, -, -, -, 5/-, -, -, 4, 5/-, -, 3, 4, 5/-, 2, 3, 4, 5/1, 2, 3, 4, 5; Each 1 bet."
 					}
@@ -38,14 +40,12 @@
 				],
 				"Group": [
 
-
-
 					{
 						"playMethodName": "All 5 Group 120",
 						"numberOfRows": 1,
 						"basePrize": 162,
-						"betPlan": [],
-						"repetitions": [],
+						"sampleSpace":5,
+						"minSelectionPerRow":5,
 						"sectionTitle": "Group",
 						"howToPlay": "How to play: Pick 5 numbers to form 1 bet, the picked numbers match the winning number (in any order) to win. Win Sample：Bet plan: 0, 2, 3, 8, 9; Winning No.: 9, 8, 0, 2, 3, as win."
 					},

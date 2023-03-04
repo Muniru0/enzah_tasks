@@ -2,8 +2,8 @@
 import {getVerticalSlotsActionsButtonsMarkup,slots_buttons_markup,getSlotsActionsButtonsMarkup,arrayRemove,getDrawLotsMarkup,getListParentTag,getRandomNumber,getPlayMethodTypesMarkup,playMethodsGroupName,getLotteryListMarkup,getCombinations} from './utils/utils.js'
 
 
-import { LotteryObj, PlayMethod} from "./5D/models/classes_models.js"
-import {INSTANT_GAME,PK10, _5D, MARK6, G11x6,FAST3, G3D, NORTH_VIETLOTT,Happy8, CENTRAL_VIETLOTT, SOUTH_VIETLOTT,G2COLOR,G4D,THAILOT, BASE_URL,PLAY_METHODS_GROUP_CONSTANT_NAME,PLAY_GROUP_CONSTANT_NAME,PLAY_METHODS_JSON_KEY} from "./3D_constants.js";
+import { LotteryObj, PlayMethod} from "./models/classes_models.js"
+import {B_S_O_E,SUM, THREE_OF_A_KIND, THREE_NUM, ONE_PAIR,TWO_NUM, GUESS_A_NUM,} from "./constants.js";
 import {getAll5StraightJointTotalBets,getAll5StraightComboTotalBets,getGroup120TotalBets} from "./utils/miscelleanous_functions.js"
 
 
@@ -43,8 +43,8 @@ let lotteryPlayGroups
 
 
 // declare and initialize the number of rows and columns
-const numberOfRows = 6
-const numberOfCols = 10
+const numberOfRows = 1
+const numberOfCols = 4
 
 
 // declare the total number of buttons
@@ -284,7 +284,9 @@ lotteries.forEach((lotteryHeader,index,arr) => {
 
   let lotteryData 
       const convertedLotteryName = jsonDataPath.replace(" ","_").toLocaleLowerCase()
-  try {
+       convertedLotteryName = jsonDataPath.replace(" ","/").toLocaleLowerCase()
+  
+    try {
 
     console.log(jsonDataPath.replace(" ","_").toLocaleLowerCase())
     const response = await fetch(`${BASE_URL}${convertedLotteryName}.json`);
@@ -566,7 +568,7 @@ function machineAndUserSelection(run = false) {
 }
 
 
-function prepareSlots(numRows = numberOfRows,numCols = numberOfCols,counterMaxValue = 10) {
+function prepareSlots(numRows = numberOfRows,numCols = numberOfCols,counterMaxValue = numberOfCols,playMethodType = B_S_O_E) {
 
   let count = 0;
   let rowNumber;
@@ -580,13 +582,11 @@ function prepareSlots(numRows = numberOfRows,numCols = numberOfCols,counterMaxVa
   // Loop through 10 slots to prepare the markup for each slot
   for (let index = 0; index < numRows*numCols; index++) {
   
-   
-    rowNumber = Math.trunc(index / 10);
  
     // Prepare the slots markup for each row
     buttonsMarkup = buttonsMarkup.concat(
       " ",
-      slots_buttons_markup(rowNumber, count)
+      slots_buttons_markup(rowNumber, count,playMethodType)
     )
     
 
@@ -597,28 +597,14 @@ function prepareSlots(numRows = numberOfRows,numCols = numberOfCols,counterMaxVa
 
   
 
-    if (count < 6) {
-      // prepare the slots actions buttons markup
-      slotActionsButtonsMarkup = slotActionsButtonsMarkup.concat(
-        " ",
-        getSlotsActionsButtonsMarkup(rowNumber, count)
-      );
-    }
-
-    // increment the count
-    count += 1;
-
     // for efficiency append the markup in multiples of 10
-    if (count == counterMaxValue) {
-        buttonsMarkup = getListParentTag(
-        rowNumber,
-        buttonsMarkup.concat("", slotActionsButtonsMarkup)
-      );
+    if (index == counterMaxValue) {
+      buttonsMarkup = getListParentTag(1,buttonsMarkup);
       updateListOfSlots();
-      buttonsMarkup = "";
-      slotActionsButtonsMarkup = "";
-      count = 0;
     }
+     
+      
+    
     
    
    
@@ -626,6 +612,8 @@ function prepareSlots(numRows = numberOfRows,numCols = numberOfCols,counterMaxVa
   }
 
 }
+
+
 
  function prepareVerticalActionButtons(run){
 

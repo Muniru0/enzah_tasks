@@ -1,0 +1,25 @@
+{"playGroups": [{
+		"playGroupName": "Instant Fast3",
+		"playMethodsNames": ["B/S/O/E","Sum","Three of a Kind","Three No.","One Pair","Two No.","Guess A No."],
+		"playMethods": [
+			{
+				"playMethodsGroupName": "B/S/O/E",
+				"B/S/O/E": [{
+						"playMethodName": "B/S/O/E of Sum",
+						"numberOfRows": 1,
+						"betPlan": [1,1,1,1,1],
+						"sameColumnSelection": true,
+						"basePrize": 3.97,
+						"totalNumberOfBetsFunctionFlag":"B/S/O/E of Sum",
+						"repetitions": [],
+						"sectionTitle": "B/S/O/E",
+						"howToPlay": "How to play:Pick 1 form (Big: 11-18; Small: 3-10; Odd: unit digit 1, 3, 5, 7, 9; Even: unit digit 0, 2, 4, 6, 8), match the form of Sum of 3 winning numbers to win.Win Sample：Bet plan: Small; Winning No.:1,2,3,as win."
+					}]
+				
+			}
+			
+		]
+	}]
+
+}
+

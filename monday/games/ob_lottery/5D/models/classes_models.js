@@ -27,7 +27,8 @@ class PlayMethod {
       this.playMethodName = playMethodJsonData.playMethodName;
       this.numberOfRows = playMethodJsonData.numberOfRows;
       this.sampleSpace    = playMethodJsonData.sampleSpace;
-      this.minSelectionPerRow      = playMethodJsonData.minSelectionPerRow;
+      this.betPlan      = playMethodJsonData.betPlan;
+      this.sameColumnSelection      = playMethodJsonData.sameColumnSelection;
       this.sectionTitle = playMethodJsonData.sectionTitle;
       this.howToPlay = playMethodJsonData.howToPlay;
       
